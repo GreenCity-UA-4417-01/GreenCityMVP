@@ -43,6 +43,7 @@ import static greencity.ModelUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -256,7 +257,7 @@ class HabitStatisticControllerTest {
                         .principal(getPrincipal()))
                 .andExpect(status().isBadRequest());
 
-        verify(habitStatisticService, never()).saveByHabitIdAndUserId(anyLong(), anyLong(), any(AddHabitStatisticDto.class));
+        verifyNoInteractions(habitStatisticService);
     }
 
     @Test
@@ -327,7 +328,7 @@ class HabitStatisticControllerTest {
                         .principal(getPrincipal()))
                 .andExpect(status().isBadRequest());
 
-        verify(habitStatisticService, never()).update(anyLong(), anyLong(), any(UpdateHabitStatisticDto.class));
+        verifyNoInteractions(habitStatisticService);
     }
 
     @Test
@@ -423,7 +424,7 @@ class HabitStatisticControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        verify(habitStatisticService, never()).getAmountOfAcquiredHabitsByUserId(anyLong());
+        verifyNoInteractions(habitStatisticService);
     }
 
     // ========== GET /habit/statistic/in-progress/count Tests ==========
@@ -468,7 +469,7 @@ class HabitStatisticControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        verify(habitStatisticService, never()).getAmountOfHabitsInProgressByUserId(anyLong());
+        verifyNoInteractions(habitStatisticService);
     }
 
     // ========== Helper Methods ==========
