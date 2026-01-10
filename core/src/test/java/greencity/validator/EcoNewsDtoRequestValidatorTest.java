@@ -95,7 +95,7 @@ class EcoNewsDtoRequestValidatorTest {
         }
     }
 
-    // ========== Helper Methods ==========
+    // ========== Test Data Providers ==========
 
     private static Stream<Arguments> provideValidTestData() {
         return Stream.of(
@@ -132,6 +132,8 @@ class EcoNewsDtoRequestValidatorTest {
     static Stream<Throwable> provieUrlValidatorExceptions() {
         return Stream.of(new InvalidURLException("InvalidURLException"), new RuntimeException("RuntimeException"));
     }
+
+    // ========== Helper Methods ==========
 
     private List<String> createTagsList(int numberOfTags) {
         return IntStream.rangeClosed(1, numberOfTags)
