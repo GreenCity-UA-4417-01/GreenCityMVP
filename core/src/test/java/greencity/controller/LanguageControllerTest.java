@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.times;
 
 import java.util.List;
 
@@ -44,6 +45,6 @@ class LanguageControllerTest {
         mockMvc.perform(get("/language"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[\"en\", \"ua\", \"fr\"]"));
-        verify(languageService).findAllLanguageCodes();
+        verify(languageService, times(1)).findAllLanguageCodes();
     }
 }
