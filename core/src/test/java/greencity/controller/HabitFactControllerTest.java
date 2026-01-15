@@ -34,12 +34,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class HabitFactControllerTest {
+class HabitFactControllerTest {
 
     private MockMvc mockMvc;
 
     @Mock
-    private ModelMapper modelMapper;
+    private ModelMapper mapper;
     @Mock
     private HabitFactService habitFactService;
     @InjectMocks
@@ -77,7 +77,7 @@ public class HabitFactControllerTest {
 
     @Test
     void getRandomFactByHabitId() throws Exception {
-        Long habitId = 1l;
+        Long habitId = 1L;
         String language = "en";
         LanguageTranslationDTO dto = new LanguageTranslationDTO();
 
@@ -114,7 +114,7 @@ public class HabitFactControllerTest {
 
         when(habitFactService.save(any(HabitFactPostDto.class)))
                 .thenReturn(habitFactVO);
-        when(modelMapper.map(habitFactVO, HabitFactDtoResponse.class))
+        when(mapper.map(habitFactVO, HabitFactDtoResponse.class))
                 .thenReturn(responseDto);
 
         mockMvc.perform(post("/facts")
@@ -123,7 +123,7 @@ public class HabitFactControllerTest {
                 .andExpect(status().isCreated());
 
         verify(habitFactService).save(any(HabitFactPostDto.class));
-        verify(modelMapper).map(habitFactVO, HabitFactDtoResponse.class);
+        verify(mapper).map(habitFactVO, HabitFactDtoResponse.class);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class HabitFactControllerTest {
         HabitFactVO updated = new HabitFactVO();
         when(habitFactService.update(any(HabitFactUpdateDto.class), eq(id)))
                 .thenReturn(updated);
-        when(modelMapper.map(updated, HabitFactPostDto.class))
+        when(mapper.map(updated, HabitFactPostDto.class))
                 .thenReturn(postDto);
         mockMvc.perform(
                 put(FACTS_URL + "/{id}", id)
@@ -146,15 +146,15 @@ public class HabitFactControllerTest {
 
     @Test
     void deleteById() throws Exception {
-        Long id = 1l;
+        Long id = 1L;
         mockMvc.perform(delete(FACTS_URL + "/{id}", id))
                 .andExpect(status().isOk());
         verify(habitFactService).delete(id);
     }
     @Test
     void deleteInvalid() throws Exception {
-        Long invalidId = -1l;
-        when(habitFactService.delete(invalidId)).thenThrow(BadRequestException.class);
+        Long invalidId = -1L;
+       doThrow(BadRequestException.class).when(habitFactService).delete(invalidId);
         mockMvc.perform(delete(FACTS_URL+"/{id}",invalidId))
                 .andExpect(status().isBadRequest());
         verify(habitFactService).delete(invalidId);
