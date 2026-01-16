@@ -66,6 +66,7 @@ public class EcoNewsController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = HttpStatuses.CREATED,
             content = @Content(schema = @Schema(implementation = EcoNewsGenericDto.class))),
+    @ApiResponse(responseCode = "415", description = "Unsupported Media Type - when request content type is not supported")
     })
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<EcoNewsGenericDto> save(
