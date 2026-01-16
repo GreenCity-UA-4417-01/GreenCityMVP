@@ -81,10 +81,11 @@ class EcoNewsDtoRequestValidatorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provieUrlValidatorExceptions")
+    @MethodSource("provideUrlValidatorExceptions")
     void isValid_ShouldThrowException_WhenUrlValidatorThrowsException(Throwable exception) {
         // given
         this.request.setSource("https://example.com");
+        this.request.setTags(createTagsList(1));
 
         // when & then
         try (MockedStatic<UrlValidator> urlValidator = mockStatic(UrlValidator.class)) {
@@ -129,7 +130,7 @@ class EcoNewsDtoRequestValidatorTest {
         );
     }
 
-    static Stream<Throwable> provieUrlValidatorExceptions() {
+    static Stream<Throwable> provideUrlValidatorExceptions() {
         return Stream.of(new InvalidURLException("InvalidURLException"), new RuntimeException("RuntimeException"));
     }
 
