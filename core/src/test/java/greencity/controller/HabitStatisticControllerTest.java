@@ -274,7 +274,7 @@ class HabitStatisticControllerTest {
                 .thenThrow(NotFoundException.class);
 
         // when & then
-        mockMvc.perform(post(HABIT_STATISTIC_PATH + "/{id}", nonExistentId)
+        mockMvc.perform(post(HABIT_STATISTIC_PATH + "/{habitId}", nonExistentId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(addStatDto))
