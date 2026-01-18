@@ -3,7 +3,6 @@ package greencity.filters;
 import greencity.dto.habitfact.HabitFactViewDto;
 import greencity.entity.*;
 import jakarta.persistence.criteria.*;
-import jakarta.persistence.metamodel.ListAttribute;
 import jakarta.persistence.metamodel.SingularAttribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +80,7 @@ public class HabitFactSpecificationTest {
     private Path<String> contentPathMock;
 
     @Mock
-    private ListJoin<HabitFact, Habit> habitJoinMock;
+    private Join<HabitFact, Habit> habitJoinMock;
 
     private List<SearchCriteria> criteriaList;
 
@@ -158,7 +157,7 @@ public class HabitFactSpecificationTest {
 
         when(criteriaBuilderMock.and(likePredicateMock, equalPredicateMock)).thenReturn(andContentPredicate);
 
-        when(criteriaBuilderMock.and(predicateMock, andContentPredicate)).thenReturn(finalPredicateMock);
+        when(criteriaBuilderMock.and(andHabitIdPredicate, andContentPredicate)).thenReturn(finalPredicateMock);
 
         habitFactSpecification.toPredicate(habitFactRootMock, criteriaQueryMock, criteriaBuilderMock);
 
