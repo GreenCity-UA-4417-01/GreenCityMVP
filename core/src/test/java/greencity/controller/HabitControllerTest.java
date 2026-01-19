@@ -450,6 +450,48 @@ class HabitControllerTest {
     }
 
     @Test
+    void getAllByDifferentParameters_ShouldReturnOk_WhenMultipleFiltersProvided() throws Exception {
+        String email = "user@test.com";
+        UserVO userVO = new UserVO();
+        userVO.setId(42L);
+
+        when(userService.findByEmail(email)).thenReturn(userVO);
+
+        List<String> tags = List.of("eco");
+        List<Integer> complexities = List.of(1, 3);
+
+        PageableDto<HabitDto> response = new PageableDto<>(List.of(), 0L, 0, 1);
+
+        when(habitService.getAllByDifferentParameters(
+                eq(userVO),
+                any(Pageable.class),
+                eq(Optional.of(tags)),
+                eq(Optional.of(true)),
+                eq(Optional.of(complexities)),
+                eq(LANG)))
+                .thenReturn(response);
+
+        mockMvc.perform(get(HABIT_PATH + "/search")
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+                        .param("tags", "eco")
+                        .param("isCustomHabit", "true")
+                        .param("complexities", "1", "3")
+                        .principal((Principal) () -> email))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+        verify(userService).findByEmail(email);
+        verify(habitService).getAllByDifferentParameters(
+                eq(userVO),
+                any(Pageable.class),
+                eq(Optional.of(tags)),
+                eq(Optional.of(true)),
+                eq(Optional.of(complexities)),
+                eq(LANG));
+        verifyNoMoreInteractions(habitService);
+    }
+
+    @Test
     void getAllByDifferentParameters_ShouldReturnBadRequest_WhenNoFilterParamsProvided() throws Exception {
         String email = "user@test.com";
         UserVO userVO = new UserVO();
@@ -651,7 +693,7 @@ class HabitControllerTest {
         String email = "user@test.com";
 
         AddCustomHabitDtoRequest invalidRequest = AddCustomHabitDtoRequest.builder()
-                .complexity(null) // violates @NotNull
+                .complexity(null)
                 .defaultDuration(7)
                 .tagIds(Set.of(1L))
                 .build();
