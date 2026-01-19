@@ -29,6 +29,7 @@ import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockMultipartFile;
@@ -105,7 +106,7 @@ class HabitControllerTest {
         when(habitService.getByIdAndLanguageCode(habitId, LANG)).thenReturn(habitDto);
 
         mockMvc.perform(get(HABIT_PATH + "/{id}", habitId)
-                        .param("lang", LANG))
+                .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(habitId));
@@ -121,7 +122,7 @@ class HabitControllerTest {
         when(habitService.getByIdAndLanguageCode(habitId, LANG)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(get(HABIT_PATH + "/{id}", habitId)
-                        .param("lang", LANG))
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
                 .andExpect(status().isNotFound());
 
         verify(habitService).getByIdAndLanguageCode(habitId, LANG);
@@ -130,8 +131,7 @@ class HabitControllerTest {
 
     @Test
     void getHabitById_ShouldReturnBadRequest_WhenIdIsNotLong() throws Exception {
-        mockMvc.perform(get(HABIT_PATH + "/{id}", "invalid-id")
-                        .param("lang", LANG))
+        mockMvc.perform(get(HABIT_PATH + "/{id}", "invalid-id"))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(habitService, tagsService, userService, modelMapper);
@@ -158,7 +158,7 @@ class HabitControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH)
-                        .param("lang", LANG)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
                         .principal((Principal) () -> email))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -200,7 +200,7 @@ class HabitControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH)
-                        .param("lang", LANG)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
                         .param("page", "2")
                         .param("size", "10")
                         .param("sort", "id,desc")
@@ -247,7 +247,7 @@ class HabitControllerTest {
                 .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get(HABIT_PATH)
-                        .param("lang", LANG)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
                         .principal((Principal) () -> email))
                 .andExpect(status().isNotFound());
 
@@ -267,7 +267,7 @@ class HabitControllerTest {
         when(habitService.getShoppingListForHabit(habitId, LANG)).thenReturn(List.of());
 
         mockMvc.perform(get(HABIT_PATH + "/{id}/shopping-list", habitId)
-                        .param("lang", LANG))
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
@@ -284,7 +284,7 @@ class HabitControllerTest {
         when(habitService.getShoppingListForHabit(habitId, LANG)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(get(HABIT_PATH + "/{id}/shopping-list", habitId)
-                        .param("lang", LANG))
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
                 .andExpect(status().isNotFound());
 
         verify(habitService).getShoppingListForHabit(habitId, LANG);
@@ -312,7 +312,7 @@ class HabitControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH + "/tags/search")
-                        .param("lang", LANG)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
                         .param("tags", "eco", "recycling")
                         .param("page", "0")
                         .param("size", "5"))
@@ -348,7 +348,7 @@ class HabitControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH + "/tags/search")
-                        .param("lang", LANG)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
                         .param("tags", "eco")
                         .param("page", "2")
                         .param("size", "10")
@@ -384,7 +384,7 @@ class HabitControllerTest {
     @Test
     void getAllByTagsAndLanguageCode_ShouldReturnBadRequest_WhenTagsParamMissing() throws Exception {
         mockMvc.perform(get(HABIT_PATH + "/tags/search")
-                        .param("lang", LANG))
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(habitService);
@@ -411,7 +411,7 @@ class HabitControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH + "/search")
-                        .param("lang", LANG)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
                         .param("tags", "eco")
                         .param("page", "2")
                         .param("size", "10")
@@ -455,7 +455,7 @@ class HabitControllerTest {
         when(userService.findByEmail(email)).thenReturn(userVO);
 
         mockMvc.perform(get(HABIT_PATH + "/search")
-                        .param("lang", LANG)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
                         .principal((Principal) () -> email))
                 .andExpect(status().isBadRequest());
 
@@ -475,7 +475,7 @@ class HabitControllerTest {
         when(tagsService.findAllHabitsTags(LANG)).thenReturn(tags);
 
         mockMvc.perform(get(HABIT_PATH + "/tags")
-                        .param("lang", LANG))
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
@@ -494,7 +494,7 @@ class HabitControllerTest {
         when(tagsService.findAllHabitsTags(LANG)).thenReturn(List.of());
 
         mockMvc.perform(get(HABIT_PATH + "/tags")
-                        .param("lang", LANG))
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
