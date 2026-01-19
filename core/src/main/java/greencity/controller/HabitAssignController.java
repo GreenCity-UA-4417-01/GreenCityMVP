@@ -51,7 +51,6 @@ public class HabitAssignController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @PostMapping("/{habitId}")
     public ResponseEntity<HabitAssignManagementDto> assignDefault(@PathVariable Long habitId,
         @Parameter(hidden = true) @CurrentUser UserVO userVO) {
