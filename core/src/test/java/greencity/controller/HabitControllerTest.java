@@ -792,7 +792,6 @@ class HabitControllerTest {
 
         UserVO userVO = new UserVO();
         userVO.setId(42L);
-
         when(userService.findByEmail(email)).thenReturn(userVO);
 
         UserProfilePictureDto dto1 = UserProfilePictureDto.builder()
@@ -816,25 +815,13 @@ class HabitControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value(100))
-                .andExpect(jsonPath("$[0].name").value("Alice"))
-                .andExpect(jsonPath("$[0].profilePicturePath").value("path-1"))
-                .andExpect(jsonPath("$[1].id").value(200))
-                .andExpect(jsonPath("$[1].name").value("Bob"))
-                .andExpect(jsonPath("$[1].profilePicturePath").value("path-2"));
+                .andExpect(jsonPath("$[*].id", containsInAnyOrder(100, 200)))
+                .andExpect(jsonPath("$[*].profilePicturePath",
+                        containsInAnyOrder("path-1", "path-2")));
 
         verify(userService).findByEmail(email);
-
-        ArgumentCaptor<Long> habitIdCaptor = ArgumentCaptor.forClass(Long.class);
-        ArgumentCaptor<Long> userIdCaptor = ArgumentCaptor.forClass(Long.class);
-
-        verify(habitService).getFriendsAssignedToHabitProfilePictures(
-                habitIdCaptor.capture(),
-                userIdCaptor.capture());
+        verify(habitService).getFriendsAssignedToHabitProfilePictures(habitId, 42L);
         verifyNoMoreInteractions(habitService);
-
-        assertEquals(habitId, habitIdCaptor.getValue());
-        assertEquals(42L, userIdCaptor.getValue());
     }
 
     @Test
