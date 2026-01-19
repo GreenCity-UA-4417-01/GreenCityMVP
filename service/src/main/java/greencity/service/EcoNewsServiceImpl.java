@@ -18,10 +18,7 @@ import greencity.entity.*;
 import greencity.entity.localization.TagTranslation;
 import greencity.enums.Role;
 import greencity.enums.TagType;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.NotSavedException;
-import greencity.exception.exceptions.UnsupportedSortException;
+import greencity.exception.exceptions.*;
 import greencity.filters.EcoNewsSpecification;
 import greencity.filters.SearchCriteria;
 import greencity.repository.EcoNewsRepo;
@@ -485,10 +482,10 @@ public class EcoNewsServiceImpl implements EcoNewsService {
      */
     @CacheEvict(value = CacheConstants.NEWEST_ECO_NEWS_CACHE_NAME, allEntries = true)
     @Override
-    public EcoNewsGenericDto update(UpdateEcoNewsDto updateEcoNewsDto, MultipartFile image, UserVO user) {
+    public EcoNewsGenericDto update(UpdateEcoNewsDto updateEcoNewsDto, MultipartFile image, UserVO user)  {
         EcoNews toUpdate = modelMapper.map(findById(updateEcoNewsDto.getId()), EcoNews.class);
         if (user.getRole() != Role.ROLE_ADMIN && !user.getId().equals(toUpdate.getAuthor().getId())) {
-            throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
+            throw new UserHasNoPermissionToAccessException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
         enhanceWithNewData(toUpdate, updateEcoNewsDto, image);
         ecoNewsRepo.save(toUpdate);
