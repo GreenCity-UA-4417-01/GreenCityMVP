@@ -19,6 +19,8 @@ import greencity.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -106,7 +108,7 @@ class HabitControllerTest {
         when(habitService.getByIdAndLanguageCode(habitId, LANG)).thenReturn(habitDto);
 
         mockMvc.perform(get(HABIT_PATH + "/{id}", habitId)
-                .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(habitId));
@@ -650,6 +652,33 @@ class HabitControllerTest {
 
         AddCustomHabitDtoRequest invalidRequest = AddCustomHabitDtoRequest.builder()
                 .complexity(null) // violates @NotNull
+                .defaultDuration(7)
+                .tagIds(Set.of(1L))
+                .build();
+
+        MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "request.json",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(invalidRequest)
+        );
+
+        mockMvc.perform(multipart(HABIT_PATH + "/custom")
+                        .file(requestPart)
+                        .principal(() -> email)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(habitService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 4})
+    void addCustomHabit_ShouldReturnBadRequest_WhenComplexityOutOfRange(int complexity) throws Exception {
+        String email = "user@test.com";
+
+        AddCustomHabitDtoRequest invalidRequest = AddCustomHabitDtoRequest.builder()
+                .complexity(complexity)
                 .defaultDuration(7)
                 .tagIds(Set.of(1L))
                 .build();
