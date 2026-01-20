@@ -149,6 +149,7 @@ public class EcoNewsController {
                     content = @Content(schema = @Schema(implementation = EcoNewsGenericDto.class))),
             @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
             @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
