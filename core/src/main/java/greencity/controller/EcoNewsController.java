@@ -284,7 +284,8 @@ public class EcoNewsController {
      */
     @Operation(summary = "Get three recommended eco news.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400",description = HttpStatuses.BAD_REQUEST)
     })
     @GetMapping("/recommended")
     public ResponseEntity<List<EcoNewsDto>> getThreeRecommendedEcoNews(@RequestParam() Long openedEcoNewsId) {
