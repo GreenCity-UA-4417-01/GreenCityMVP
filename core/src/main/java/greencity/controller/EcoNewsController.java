@@ -9,6 +9,7 @@ import greencity.dto.tag.TagDto;
 import greencity.dto.tag.TagVO;
 import greencity.dto.user.UserVO;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.handler.ExceptionResponse;
 import greencity.service.EcoNewsService;
 import greencity.service.FileService;
 import greencity.service.TagsService;
@@ -285,7 +286,11 @@ public class EcoNewsController {
     @Operation(summary = "Get three recommended eco news.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400",description = HttpStatuses.BAD_REQUEST)
+            @ApiResponse(responseCode = "400",description = HttpStatuses.BAD_REQUEST,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionResponse.class)
+            ))
     })
     @GetMapping("/recommended")
     public ResponseEntity<List<EcoNewsDto>> getThreeRecommendedEcoNews(@RequestParam() Long openedEcoNewsId) {
