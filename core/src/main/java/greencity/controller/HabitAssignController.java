@@ -46,12 +46,11 @@ public class HabitAssignController {
     @Operation(summary = "Assign habit with default properties for current user.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @PostMapping("/{habitId}")
     public ResponseEntity<HabitAssignManagementDto> assignDefault(@PathVariable Long habitId,
         @Parameter(hidden = true) @CurrentUser UserVO userVO) {
@@ -71,7 +70,7 @@ public class HabitAssignController {
     @Operation(summary = "Assign habit with custom properties for current user and his friends.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
@@ -97,7 +96,7 @@ public class HabitAssignController {
     @Operation(summary = "Update duration of habit with habitAssignId for user.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitAssignUserDurationDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignUserDurationDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
@@ -122,7 +121,7 @@ public class HabitAssignController {
     @Operation(summary = "Get habit assign.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
@@ -147,7 +146,7 @@ public class HabitAssignController {
     @Operation(summary = "Get (inprogress, acquired) assigned habits for current user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitAssignDto.class)))),
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitAssignDto.class)))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
@@ -172,7 +171,7 @@ public class HabitAssignController {
     @Operation(summary = "Get user shopping and custom shopping lists by habitAssignId")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = UserShoppingAndCustomShoppingListsDto.class))),
+            content = @Content(schema = @Schema(implementation = UserShoppingAndCustomShoppingListsDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
@@ -198,11 +197,11 @@ public class HabitAssignController {
      */
     @Operation(summary = "Update user and custom shopping lists",
         description = """
-             If the item is already present in the db, the method updates it
-             If item is not present in the db and id is null, the method attempts to add it to the user
-             If some items from db are not present in the lists, the method deletes
-             them (except for items with DISABLED status).
-             """)
+            If the item is already present in the db, the method updates it
+            If item is not present in the db and id is null, the method attempts to add it to the user
+            If some items from db are not present in the lists, the method deletes
+            them (except for items with DISABLED status).
+            """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
@@ -232,7 +231,7 @@ public class HabitAssignController {
     @Operation(summary = "Get list of user shopping list items and custom shopping list items with status INPROGRESS")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = UserShoppingAndCustomShoppingListsDto.class))),
+            content = @Content(schema = @Schema(implementation = UserShoppingAndCustomShoppingListsDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
@@ -258,7 +257,7 @@ public class HabitAssignController {
     @Operation(summary = "Get all inprogress, acquired assigns by certain habit.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitAssignDto.class)))),
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitAssignDto.class)))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     })
@@ -282,7 +281,7 @@ public class HabitAssignController {
     @Operation(summary = "Get inprogress or acquired assign by habit id for current user.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
@@ -310,7 +309,7 @@ public class HabitAssignController {
     @Operation(summary = "Get habit assign by habit assign id for current user.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
@@ -337,7 +336,7 @@ public class HabitAssignController {
     @Operation(summary = "Update inprogress, acquired user habit assign acquired or cancelled status.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
@@ -361,7 +360,7 @@ public class HabitAssignController {
     @Operation(summary = "Enroll habit assign by habitAssignId for current user.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
@@ -388,7 +387,7 @@ public class HabitAssignController {
     @Operation(summary = "Unenroll assigned habit for a specific day.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
@@ -414,7 +413,7 @@ public class HabitAssignController {
     @Operation(summary = "Get inprogress user habit assigns on certain date.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     })
@@ -442,7 +441,7 @@ public class HabitAssignController {
     @Operation(summary = "Get user inprogress activities between the specified dates.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitsDateEnrollmentDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitsDateEnrollmentDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     })
@@ -469,7 +468,7 @@ public class HabitAssignController {
     @Operation(summary = "Cancel inprogress user assigned habit.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
+            content = @Content(schema = @Schema(implementation = HabitAssignDto.class))),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
