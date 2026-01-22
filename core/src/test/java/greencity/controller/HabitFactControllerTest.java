@@ -1,6 +1,5 @@
 package greencity.controller;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.dto.PageableDto;
 import greencity.dto.habitfact.HabitFactDtoResponse;
@@ -55,22 +54,21 @@ class HabitFactControllerTest {
     @BeforeEach
     void setup() {
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(habitFactController)
-                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-                .setValidator(mockValidator)
-                .setControllerAdvice(new CustomExceptionHandler(errorAttributes,objectMapper))
-                .build();
+            .standaloneSetup(habitFactController)
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+            .setValidator(mockValidator)
+            .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
+            .build();
     }
-
 
     @Test
     void getHabitFactOfTheDay() throws Exception {
         Long languageId = 1L;
         LanguageTranslationDTO dto = new LanguageTranslationDTO();
         when(habitFactService.getHabitFactOfTheDay(languageId))
-                .thenReturn(dto);
+            .thenReturn(dto);
         mockMvc.perform(get(FACTS_URL + "/dayFact/{languageId}", languageId))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
 
         verify(habitFactService).getHabitFactOfTheDay(languageId);
     }
@@ -82,28 +80,26 @@ class HabitFactControllerTest {
         LanguageTranslationDTO dto = new LanguageTranslationDTO();
 
         when(habitFactService.getRandomHabitFactByHabitIdAndLanguage(habitId, language))
-                .thenReturn(dto);
+            .thenReturn(dto);
 
         mockMvc.perform(
-                        get(FACTS_URL + "/random/{habitId}", habitId)
-                                .locale(Locale.ENGLISH)
-                )
-                .andExpect(status().isOk());
+            get(FACTS_URL + "/random/{habitId}", habitId)
+                .locale(Locale.ENGLISH))
+            .andExpect(status().isOk());
         verify(habitFactService).getRandomHabitFactByHabitIdAndLanguage(habitId, language);
     }
 
     @Test
     void getAll() throws Exception {
         PageableDto<LanguageTranslationDTO> pageableDto = new PageableDto<>(
-                List.of(new LanguageTranslationDTO()),
-                1,
-                0,
-                1
-        );
+            List.of(new LanguageTranslationDTO()),
+            1,
+            0,
+            1);
         when(habitFactService.getAllHabitFacts(any(), eq("en")))
-                .thenReturn(pageableDto);
+            .thenReturn(pageableDto);
         mockMvc.perform(get(FACTS_URL))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
         verify(habitFactService).getAllHabitFacts(any(), eq("en"));
     }
 
@@ -113,14 +109,14 @@ class HabitFactControllerTest {
         HabitFactDtoResponse responseDto = new HabitFactDtoResponse();
 
         when(habitFactService.save(any(HabitFactPostDto.class)))
-                .thenReturn(habitFactVO);
+            .thenReturn(habitFactVO);
         when(mapper.map(habitFactVO, HabitFactDtoResponse.class))
-                .thenReturn(responseDto);
+            .thenReturn(responseDto);
 
         mockMvc.perform(post("/facts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{}"))
+            .andExpect(status().isCreated());
 
         verify(habitFactService).save(any(HabitFactPostDto.class));
         verify(mapper).map(habitFactVO, HabitFactDtoResponse.class);
@@ -132,33 +128,33 @@ class HabitFactControllerTest {
         HabitFactPostDto postDto = new HabitFactPostDto();
         HabitFactVO updated = new HabitFactVO();
         when(habitFactService.update(any(HabitFactUpdateDto.class), eq(id)))
-                .thenReturn(updated);
+            .thenReturn(updated);
         when(mapper.map(updated, HabitFactPostDto.class))
-                .thenReturn(postDto);
+            .thenReturn(postDto);
         mockMvc.perform(
-                put(FACTS_URL + "/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}")
-        ).andExpect(status().isOk());
+            put(FACTS_URL + "/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+            .andExpect(status().isOk());
         verify(habitFactService)
-                .update(any(HabitFactUpdateDto.class), eq(id));
+            .update(any(HabitFactUpdateDto.class), eq(id));
     }
 
     @Test
     void deleteById() throws Exception {
         Long id = 1L;
         mockMvc.perform(delete(FACTS_URL + "/{id}", id))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
         verify(habitFactService).delete(id);
     }
+
     @Test
     void deleteInvalid() throws Exception {
         Long invalidId = -1L;
-       doThrow(BadRequestException.class).when(habitFactService).delete(invalidId);
-        mockMvc.perform(delete(FACTS_URL+"/{id}",invalidId))
-                .andExpect(status().isBadRequest());
+        doThrow(BadRequestException.class).when(habitFactService).delete(invalidId);
+        mockMvc.perform(delete(FACTS_URL + "/{id}", invalidId))
+            .andExpect(status().isBadRequest());
         verify(habitFactService).delete(invalidId);
     }
-
 
 }

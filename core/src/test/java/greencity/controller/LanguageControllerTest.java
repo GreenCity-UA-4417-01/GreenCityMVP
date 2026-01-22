@@ -43,8 +43,8 @@ class LanguageControllerTest {
     @Test
     void getAllLanguageCodesTest() throws Exception {
         mockMvc.perform(get("/language"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[\"en\", \"ua\", \"fr\"]"));
+            .andExpect(status().isOk())
+            .andExpect(content().json("[\"en\", \"ua\", \"fr\"]"));
         verify(languageService, times(1)).findAllLanguageCodes();
     }
 }
