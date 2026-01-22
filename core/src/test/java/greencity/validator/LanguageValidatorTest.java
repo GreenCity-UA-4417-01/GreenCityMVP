@@ -34,14 +34,14 @@ class LanguageValidatorTest {
         languageValidator.initialize(validLanguage);
     }
 
-    //check language code of ENG in the list and has return true
+    // check language code of ENG in the list and has return true
     @Test
     void isValidTrueTest() {
         boolean result = languageValidator.isValid(Locale.ENGLISH, constraintValidatorContext);
         assertTrue(result);
     }
 
-    //check language code of FRENCH in the list and has return false
+    // check language code of FRENCH in the list and has return false
     @Test
     void isValidFalseTest() {
         boolean result = languageValidator.isValid(Locale.FRENCH, constraintValidatorContext);

@@ -83,35 +83,34 @@ class HabitControllerTest {
     @BeforeEach
     void setUp() {
         objectMapper = JsonMapper.builder()
-                .addModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .build();
+            .addModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .build();
 
         mockMvc = MockMvcBuilders.standaloneSetup(habitController)
-                .setCustomArgumentResolvers(
-                        new UserArgumentResolver(userService, modelMapper),
-                        new PageableHandlerMethodArgumentResolver()
-                )
-                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
-                .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
-                .build();
+            .setCustomArgumentResolvers(
+                new UserArgumentResolver(userService, modelMapper),
+                new PageableHandlerMethodArgumentResolver())
+            .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+            .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
+            .build();
     }
 
     @Test
     void getHabitById_ShouldReturnHabitAndOkStatus_WhenHabitExists() throws Exception {
         Long habitId = 1L;
         HabitDto habitDto = HabitDto.builder()
-                .id(habitId)
-                .complexity(1)
-                .build();
+            .id(habitId)
+            .complexity(1)
+            .build();
 
         when(habitService.getByIdAndLanguageCode(habitId, LANG)).thenReturn(habitDto);
 
         mockMvc.perform(get(HABIT_PATH + "/{id}", habitId)
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(habitId));
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(habitId));
 
         verify(habitService).getByIdAndLanguageCode(habitId, LANG);
         verifyNoMoreInteractions(habitService);
@@ -124,8 +123,8 @@ class HabitControllerTest {
         when(habitService.getByIdAndLanguageCode(habitId, LANG)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(get(HABIT_PATH + "/{id}", habitId)
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
-                .andExpect(status().isNotFound());
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
+            .andExpect(status().isNotFound());
 
         verify(habitService).getByIdAndLanguageCode(habitId, LANG);
         verifyNoMoreInteractions(habitService);
@@ -134,7 +133,7 @@ class HabitControllerTest {
     @Test
     void getHabitById_ShouldReturnBadRequest_WhenIdIsNotLong() throws Exception {
         mockMvc.perform(get(HABIT_PATH + "/{id}", "invalid-id"))
-                .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest());
 
         verifyNoInteractions(habitService, tagsService, userService, modelMapper);
     }
@@ -151,33 +150,33 @@ class HabitControllerTest {
         HabitDto habit2 = HabitDto.builder().id(2L).complexity(2).build();
 
         PageableDto<HabitDto> response =
-                new PageableDto<>(List.of(habit1, habit2), 2L, 0, 1);
+            new PageableDto<>(List.of(habit1, habit2), 2L, 0, 1);
 
         when(habitService.getAllHabitsByLanguageCode(
-                eq(userVO),
-                any(Pageable.class),
-                eq(LANG)))
-                .thenReturn(response);
+            eq(userVO),
+            any(Pageable.class),
+            eq(LANG)))
+            .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH)
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
-                        .principal((Principal) () -> email))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.currentPage").value(0))
-                .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.totalElements").value(2))
-                .andExpect(jsonPath("$.page").isArray())
-                .andExpect(jsonPath("$.page", hasSize(2)))
-                .andExpect(jsonPath("$.page[0].id").value(1))
-                .andExpect(jsonPath("$.page[1].id").value(2));
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+            .principal((Principal) () -> email))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.currentPage").value(0))
+            .andExpect(jsonPath("$.totalPages").value(1))
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.page").isArray())
+            .andExpect(jsonPath("$.page", hasSize(2)))
+            .andExpect(jsonPath("$.page[0].id").value(1))
+            .andExpect(jsonPath("$.page[1].id").value(2));
 
         verify(userService).findByEmail(email);
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(habitService).getAllHabitsByLanguageCode(
-                eq(userVO), pageableCaptor.capture(),
-                eq(LANG));
+            eq(userVO), pageableCaptor.capture(),
+            eq(LANG));
         verifyNoMoreInteractions(habitService);
 
         Pageable captured = pageableCaptor.getValue();
@@ -196,30 +195,30 @@ class HabitControllerTest {
         PageableDto<HabitDto> response = new PageableDto<>(List.of(), 0L, 2, 1);
 
         when(habitService.getAllHabitsByLanguageCode(
-                eq(userVO),
-                any(Pageable.class),
-                eq(LANG)))
-                .thenReturn(response);
+            eq(userVO),
+            any(Pageable.class),
+            eq(LANG)))
+            .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH)
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
-                        .param("page", "2")
-                        .param("size", "10")
-                        .param("sort", "id,desc")
-                        .principal((Principal) () -> email))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.currentPage").value(2))
-                .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.totalElements").value(0))
-                .andExpect(jsonPath("$.page").isArray())
-                .andExpect(jsonPath("$.page", hasSize(0)));
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+            .param("page", "2")
+            .param("size", "10")
+            .param("sort", "id,desc")
+            .principal((Principal) () -> email))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.currentPage").value(2))
+            .andExpect(jsonPath("$.totalPages").value(1))
+            .andExpect(jsonPath("$.totalElements").value(0))
+            .andExpect(jsonPath("$.page").isArray())
+            .andExpect(jsonPath("$.page", hasSize(0)));
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(habitService).getAllHabitsByLanguageCode(
-                eq(userVO),
-                pageableCaptor.capture(),
-                eq(LANG));
+            eq(userVO),
+            pageableCaptor.capture(),
+            eq(LANG));
 
         Pageable captured = pageableCaptor.getValue();
         assertEquals(2, captured.getPageNumber());
@@ -233,7 +232,6 @@ class HabitControllerTest {
         verifyNoMoreInteractions(habitService);
     }
 
-
     @Test
     void getAll_ShouldReturnNotFound_WhenServiceThrowsNotFoundException() throws Exception {
 
@@ -243,24 +241,23 @@ class HabitControllerTest {
 
         when(userService.findByEmail(email)).thenReturn(userVO);
         when(habitService.getAllHabitsByLanguageCode(
-                eq(userVO),
-                any(Pageable.class),
-                eq(LANG)))
-                .thenThrow(NotFoundException.class);
+            eq(userVO),
+            any(Pageable.class),
+            eq(LANG)))
+            .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get(HABIT_PATH)
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
-                        .principal((Principal) () -> email))
-                .andExpect(status().isNotFound());
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+            .principal((Principal) () -> email))
+            .andExpect(status().isNotFound());
 
         verify(userService).findByEmail(email);
         verify(habitService).getAllHabitsByLanguageCode(
-                eq(userVO),
-                any(Pageable.class),
-                eq(LANG));
+            eq(userVO),
+            any(Pageable.class),
+            eq(LANG));
         verifyNoMoreInteractions(habitService);
     }
-
 
     @Test
     void getShoppingListItems_ShouldReturnShoppingListAndOkStatus_WhenHabitExists() throws Exception {
@@ -269,11 +266,11 @@ class HabitControllerTest {
         when(habitService.getShoppingListForHabit(habitId, LANG)).thenReturn(List.of());
 
         mockMvc.perform(get(HABIT_PATH + "/{id}/shopping-list", habitId)
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
 
         verify(habitService).getShoppingListForHabit(habitId, LANG);
         verifyNoMoreInteractions(habitService);
@@ -286,50 +283,49 @@ class HabitControllerTest {
         when(habitService.getShoppingListForHabit(habitId, LANG)).thenThrow(NotFoundException.class);
 
         mockMvc.perform(get(HABIT_PATH + "/{id}/shopping-list", habitId)
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
-                .andExpect(status().isNotFound());
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
+            .andExpect(status().isNotFound());
 
         verify(habitService).getShoppingListForHabit(habitId, LANG);
         verifyNoMoreInteractions(habitService);
     }
-
 
     @Test
     void getAllByTagsAndLanguageCode_ShouldReturnPageableDtoAndOkStatus_WhenValidRequest() throws Exception {
         HabitDto habit1 = HabitDto.builder().id(1L).complexity(1).build();
         HabitDto habit2 = HabitDto.builder().id(2L).complexity(2).build();
         PageableDto<HabitDto> response = new PageableDto<>(List.of(
-                habit1,
-                habit2),
-                2L,
-                0,
-                1);
+            habit1,
+            habit2),
+            2L,
+            0,
+            1);
 
         List<String> tags = List.of("eco", "recycling");
 
         when(habitService.getAllByTagsAndLanguageCode(
-                any(Pageable.class),
-                eq(tags),
-                eq(LANG)))
-                .thenReturn(response);
+            any(Pageable.class),
+            eq(tags),
+            eq(LANG)))
+            .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH + "/tags/search")
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
-                        .param("tags", "eco", "recycling")
-                        .param("page", "0")
-                        .param("size", "5"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.currentPage").value(0))
-                .andExpect(jsonPath("$.totalElements").value(2))
-                .andExpect(jsonPath("$.page", hasSize(2)));
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+            .param("tags", "eco", "recycling")
+            .param("page", "0")
+            .param("size", "5"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.currentPage").value(0))
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.page", hasSize(2)));
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
 
         verify(habitService).getAllByTagsAndLanguageCode(
-                pageableCaptor.capture(),
-                eq(tags),
-                eq(LANG));
+            pageableCaptor.capture(),
+            eq(tags),
+            eq(LANG));
 
         verifyNoMoreInteractions(habitService);
 
@@ -344,54 +340,51 @@ class HabitControllerTest {
         PageableDto<HabitDto> response = new PageableDto<>(List.of(), 0L, 2, 1);
 
         when(habitService.getAllByTagsAndLanguageCode(
-                any(Pageable.class),
-                eq(tags),
-                eq(LANG)))
-                .thenReturn(response);
+            any(Pageable.class),
+            eq(tags),
+            eq(LANG)))
+            .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH + "/tags/search")
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
-                        .param("tags", "eco")
-                        .param("page", "2")
-                        .param("size", "10")
-                        .param("sort", "id,desc"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.currentPage").value(2))
-                .andExpect(jsonPath("$.totalElements").value(0))
-                .andExpect(jsonPath("$.page").isArray())
-                .andExpect(jsonPath("$.page", hasSize(0)));
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+            .param("tags", "eco")
+            .param("page", "2")
+            .param("size", "10")
+            .param("sort", "id,desc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.currentPage").value(2))
+            .andExpect(jsonPath("$.totalElements").value(0))
+            .andExpect(jsonPath("$.page").isArray())
+            .andExpect(jsonPath("$.page", hasSize(0)));
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
 
         verify(habitService).getAllByTagsAndLanguageCode(
-                pageableCaptor.capture(),
-                eq(tags),
-                eq(LANG));
+            pageableCaptor.capture(),
+            eq(tags),
+            eq(LANG));
         verifyNoMoreInteractions(habitService);
 
         Pageable captured = pageableCaptor.getValue();
         assertAll("Verify Pageable mapping",
-                () -> assertEquals(2, captured.getPageNumber()),
-                () -> assertEquals(10, captured.getPageSize()),
-                () -> {
-                    Sort.Order idOrder = captured.getSort().getOrderFor("id");
-                    assertNotNull(idOrder);
-                    assertEquals(Sort.Direction.DESC, idOrder.getDirection());
-                }
-        );
+            () -> assertEquals(2, captured.getPageNumber()),
+            () -> assertEquals(10, captured.getPageSize()),
+            () -> {
+                Sort.Order idOrder = captured.getSort().getOrderFor("id");
+                assertNotNull(idOrder);
+                assertEquals(Sort.Direction.DESC, idOrder.getDirection());
+            });
     }
-
 
     @Test
     void getAllByTagsAndLanguageCode_ShouldReturnBadRequest_WhenTagsParamMissing() throws Exception {
         mockMvc.perform(get(HABIT_PATH + "/tags/search")
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
-                .andExpect(status().isBadRequest());
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
+            .andExpect(status().isBadRequest());
 
         verifyNoInteractions(habitService);
     }
-
 
     @Test
     void getAllByDifferentParameters_ShouldPassPaginationAndSortParamsToService_WhenProvided() throws Exception {
@@ -404,49 +397,48 @@ class HabitControllerTest {
         PageableDto<HabitDto> response = new PageableDto<>(List.of(), 0L, 2, 1);
 
         when(habitService.getAllByDifferentParameters(
-                eq(userVO),
-                any(Pageable.class),
-                eq(Optional.of(tags)),
-                eq(Optional.empty()),
-                eq(Optional.empty()),
-                eq(LANG)))
-                .thenReturn(response);
+            eq(userVO),
+            any(Pageable.class),
+            eq(Optional.of(tags)),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(LANG)))
+            .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH + "/search")
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
-                        .param("tags", "eco")
-                        .param("page", "2")
-                        .param("size", "10")
-                        .param("sort", "id,desc")
-                        .principal((Principal) () -> email))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.currentPage").value(2))
-                .andExpect(jsonPath("$.totalElements").value(0))
-                .andExpect(jsonPath("$.page", hasSize(0)));
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+            .param("tags", "eco")
+            .param("page", "2")
+            .param("size", "10")
+            .param("sort", "id,desc")
+            .principal((Principal) () -> email))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.currentPage").value(2))
+            .andExpect(jsonPath("$.totalElements").value(0))
+            .andExpect(jsonPath("$.page", hasSize(0)));
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
 
         verify(userService).findByEmail(email);
         verify(habitService).getAllByDifferentParameters(
-                eq(userVO),
-                pageableCaptor.capture(),
-                eq(Optional.of(tags)),
-                eq(Optional.empty()),
-                eq(Optional.empty()),
-                eq(LANG));
+            eq(userVO),
+            pageableCaptor.capture(),
+            eq(Optional.of(tags)),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(LANG));
         verifyNoMoreInteractions(habitService);
 
         Pageable captured = pageableCaptor.getValue();
         assertAll("Verify Pageable mapping",
-                () -> assertEquals(2, captured.getPageNumber()),
-                () -> assertEquals(10, captured.getPageSize()),
-                () -> {
-                    Sort.Order idOrder = captured.getSort().getOrderFor("id");
-                    assertNotNull(idOrder);
-                    assertEquals(Sort.Direction.DESC, idOrder.getDirection());
-                }
-        );
+            () -> assertEquals(2, captured.getPageNumber()),
+            () -> assertEquals(10, captured.getPageSize()),
+            () -> {
+                Sort.Order idOrder = captured.getSort().getOrderFor("id");
+                assertNotNull(idOrder);
+                assertEquals(Sort.Direction.DESC, idOrder.getDirection());
+            });
     }
 
     @Test
@@ -463,31 +455,31 @@ class HabitControllerTest {
         PageableDto<HabitDto> response = new PageableDto<>(List.of(), 0L, 0, 1);
 
         when(habitService.getAllByDifferentParameters(
-                eq(userVO),
-                any(Pageable.class),
-                eq(Optional.of(tags)),
-                eq(Optional.of(true)),
-                eq(Optional.of(complexities)),
-                eq(LANG)))
-                .thenReturn(response);
+            eq(userVO),
+            any(Pageable.class),
+            eq(Optional.of(tags)),
+            eq(Optional.of(true)),
+            eq(Optional.of(complexities)),
+            eq(LANG)))
+            .thenReturn(response);
 
         mockMvc.perform(get(HABIT_PATH + "/search")
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
-                        .param("tags", "eco")
-                        .param("isCustomHabit", "true")
-                        .param("complexities", "1", "3")
-                        .principal((Principal) () -> email))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+            .param("tags", "eco")
+            .param("isCustomHabit", "true")
+            .param("complexities", "1", "3")
+            .principal((Principal) () -> email))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         verify(userService).findByEmail(email);
         verify(habitService).getAllByDifferentParameters(
-                eq(userVO),
-                any(Pageable.class),
-                eq(Optional.of(tags)),
-                eq(Optional.of(true)),
-                eq(Optional.of(complexities)),
-                eq(LANG));
+            eq(userVO),
+            any(Pageable.class),
+            eq(Optional.of(tags)),
+            eq(Optional.of(true)),
+            eq(Optional.of(complexities)),
+            eq(LANG));
         verifyNoMoreInteractions(habitService);
     }
 
@@ -499,34 +491,32 @@ class HabitControllerTest {
         when(userService.findByEmail(email)).thenReturn(userVO);
 
         mockMvc.perform(get(HABIT_PATH + "/search")
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
-                        .principal((Principal) () -> email))
-                .andExpect(status().isBadRequest());
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG)
+            .principal((Principal) () -> email))
+            .andExpect(status().isBadRequest());
 
         verify(userService).findByEmail(email);
         verifyNoInteractions(habitService);
     }
 
-
     @Test
     void findAllHabitsTags_ShouldReturnTagsAndOkStatus_WhenValidLangProvided() throws Exception {
         List<String> tags = List.of(
-                "Resource Saving",
-                "Smart Consuming",
-                "Reusable"
-        );
+            "Resource Saving",
+            "Smart Consuming",
+            "Reusable");
 
         when(tagsService.findAllHabitsTags(LANG)).thenReturn(tags);
 
         mockMvc.perform(get(HABIT_PATH + "/tags")
-                        .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0]").value("Resource Saving"))
-                .andExpect(jsonPath("$[1]").value("Smart Consuming"))
-                .andExpect(jsonPath("$[2]").value("Reusable"));
+            .header(HttpHeaders.ACCEPT_LANGUAGE, LANG))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$", hasSize(3)))
+            .andExpect(jsonPath("$[0]").value("Resource Saving"))
+            .andExpect(jsonPath("$[1]").value("Smart Consuming"))
+            .andExpect(jsonPath("$[2]").value("Reusable"));
 
         verify(tagsService).findAllHabitsTags(LANG);
         verifyNoMoreInteractions(tagsService);
@@ -553,61 +543,59 @@ class HabitControllerTest {
         String email = "user@test.com";
 
         AddCustomHabitDtoRequest request = AddCustomHabitDtoRequest.builder()
-                .complexity(2)
-                .defaultDuration(14)
-                .tagIds(Set.of(1L, 2L))
-                .build();
+            .complexity(2)
+            .defaultDuration(14)
+            .tagIds(Set.of(1L, 2L))
+            .build();
 
         AddCustomHabitDtoResponse response = AddCustomHabitDtoResponse.builder()
-                .id(10L)
-                .userId(42L)
-                .complexity(2)
-                .defaultDuration(14)
-                .tagIds(Set.of(1L, 2L))
-                .image("some-image-url")
-                .build();
+            .id(10L)
+            .userId(42L)
+            .complexity(2)
+            .defaultDuration(14)
+            .tagIds(Set.of(1L, 2L))
+            .image("some-image-url")
+            .build();
 
         MockMultipartFile requestPart = new MockMultipartFile(
-                "request",
-                "request.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(request)
-        );
+            "request",
+            "request.json",
+            MediaType.APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsBytes(request));
 
         MockMultipartFile imagePart = new MockMultipartFile(
-                "image",
-                "habit.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "png-bytes".getBytes(StandardCharsets.UTF_8)
-        );
+            "image",
+            "habit.png",
+            MediaType.IMAGE_PNG_VALUE,
+            "png-bytes".getBytes(StandardCharsets.UTF_8));
 
         when(habitService.addCustomHabit(any(AddCustomHabitDtoRequest.class), any(MultipartFile.class), eq(email)))
-                .thenReturn(response);
+            .thenReturn(response);
 
         mockMvc.perform(multipart(HABIT_PATH + "/custom")
-                        .file(requestPart)
-                        .file(imagePart)
-                        .principal(() -> email)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(10))
-                .andExpect(jsonPath("$.userId").value(42))
-                .andExpect(jsonPath("$.complexity").value(2))
-                .andExpect(jsonPath("$.defaultDuration").value(14))
-                .andExpect(jsonPath("$.image").value("some-image-url"))
-                .andExpect(jsonPath("$.tagIds").isArray())
-                .andExpect(jsonPath("$.tagIds", containsInAnyOrder(1, 2)));
+            .file(requestPart)
+            .file(imagePart)
+            .principal(() -> email)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(10))
+            .andExpect(jsonPath("$.userId").value(42))
+            .andExpect(jsonPath("$.complexity").value(2))
+            .andExpect(jsonPath("$.defaultDuration").value(14))
+            .andExpect(jsonPath("$.image").value("some-image-url"))
+            .andExpect(jsonPath("$.tagIds").isArray())
+            .andExpect(jsonPath("$.tagIds", containsInAnyOrder(1, 2)));
 
         ArgumentCaptor<AddCustomHabitDtoRequest> requestCaptor =
-                ArgumentCaptor.forClass(AddCustomHabitDtoRequest.class);
+            ArgumentCaptor.forClass(AddCustomHabitDtoRequest.class);
         ArgumentCaptor<MultipartFile> imageCaptor =
-                ArgumentCaptor.forClass(MultipartFile.class);
+            ArgumentCaptor.forClass(MultipartFile.class);
 
         verify(habitService).addCustomHabit(
-                requestCaptor.capture(),
-                imageCaptor.capture(),
-                eq(email));
+            requestCaptor.capture(),
+            imageCaptor.capture(),
+            eq(email));
         verifyNoMoreInteractions(habitService);
 
         AddCustomHabitDtoRequest capturedRequest = requestCaptor.getValue();
@@ -626,45 +614,44 @@ class HabitControllerTest {
         String email = "user@test.com";
 
         AddCustomHabitDtoRequest request = AddCustomHabitDtoRequest.builder()
-                .complexity(1)
-                .defaultDuration(7)
-                .tagIds(Set.of(1L))
-                .build();
+            .complexity(1)
+            .defaultDuration(7)
+            .tagIds(Set.of(1L))
+            .build();
 
         AddCustomHabitDtoResponse response = AddCustomHabitDtoResponse.builder()
-                .id(11L)
-                .userId(42L)
-                .complexity(1)
-                .defaultDuration(7)
-                .tagIds(Set.of(1L))
-                .build();
+            .id(11L)
+            .userId(42L)
+            .complexity(1)
+            .defaultDuration(7)
+            .tagIds(Set.of(1L))
+            .build();
 
         MockMultipartFile requestPart = new MockMultipartFile(
-                "request",
-                "request.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(request)
-        );
+            "request",
+            "request.json",
+            MediaType.APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsBytes(request));
 
         when(habitService.addCustomHabit(any(AddCustomHabitDtoRequest.class), isNull(), eq(email)))
-                .thenReturn(response);
+            .thenReturn(response);
 
         mockMvc.perform(multipart(HABIT_PATH + "/custom")
-                        .file(requestPart)
-                        .principal(() -> email)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(11))
-                .andExpect(jsonPath("$.complexity").value(1))
-                .andExpect(jsonPath("$.defaultDuration").value(7))
-                .andExpect(jsonPath("$.tagIds").isArray())
-                .andExpect(jsonPath("$.tagIds", containsInAnyOrder(1)));
+            .file(requestPart)
+            .principal(() -> email)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(11))
+            .andExpect(jsonPath("$.complexity").value(1))
+            .andExpect(jsonPath("$.defaultDuration").value(7))
+            .andExpect(jsonPath("$.tagIds").isArray())
+            .andExpect(jsonPath("$.tagIds", containsInAnyOrder(1)));
 
         verify(habitService).addCustomHabit(
-                any(AddCustomHabitDtoRequest.class),
-                isNull(),
-                eq(email));
+            any(AddCustomHabitDtoRequest.class),
+            isNull(),
+            eq(email));
         verifyNoMoreInteractions(habitService);
     }
 
@@ -673,17 +660,16 @@ class HabitControllerTest {
         String email = "user@test.com";
 
         MockMultipartFile imagePart = new MockMultipartFile(
-                "image",
-                "habit.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "png-bytes".getBytes(StandardCharsets.UTF_8)
-        );
+            "image",
+            "habit.png",
+            MediaType.IMAGE_PNG_VALUE,
+            "png-bytes".getBytes(StandardCharsets.UTF_8));
 
         mockMvc.perform(multipart(HABIT_PATH + "/custom")
-                        .file(imagePart)
-                        .principal(() -> email)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isBadRequest());
+            .file(imagePart)
+            .principal(() -> email)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isBadRequest());
 
         verifyNoInteractions(habitService);
     }
@@ -693,23 +679,22 @@ class HabitControllerTest {
         String email = "user@test.com";
 
         AddCustomHabitDtoRequest invalidRequest = AddCustomHabitDtoRequest.builder()
-                .complexity(null)
-                .defaultDuration(7)
-                .tagIds(Set.of(1L))
-                .build();
+            .complexity(null)
+            .defaultDuration(7)
+            .tagIds(Set.of(1L))
+            .build();
 
         MockMultipartFile requestPart = new MockMultipartFile(
-                "request",
-                "request.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(invalidRequest)
-        );
+            "request",
+            "request.json",
+            MediaType.APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsBytes(invalidRequest));
 
         mockMvc.perform(multipart(HABIT_PATH + "/custom")
-                        .file(requestPart)
-                        .principal(() -> email)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isBadRequest());
+            .file(requestPart)
+            .principal(() -> email)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isBadRequest());
 
         verifyNoInteractions(habitService);
     }
@@ -720,23 +705,22 @@ class HabitControllerTest {
         String email = "user@test.com";
 
         AddCustomHabitDtoRequest invalidRequest = AddCustomHabitDtoRequest.builder()
-                .complexity(complexity)
-                .defaultDuration(7)
-                .tagIds(Set.of(1L))
-                .build();
+            .complexity(complexity)
+            .defaultDuration(7)
+            .tagIds(Set.of(1L))
+            .build();
 
         MockMultipartFile requestPart = new MockMultipartFile(
-                "request",
-                "request.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(invalidRequest)
-        );
+            "request",
+            "request.json",
+            MediaType.APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsBytes(invalidRequest));
 
         mockMvc.perform(multipart(HABIT_PATH + "/custom")
-                        .file(requestPart)
-                        .principal(() -> email)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isBadRequest());
+            .file(requestPart)
+            .principal(() -> email)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isBadRequest());
 
         verifyNoInteractions(habitService);
     }
@@ -746,42 +730,40 @@ class HabitControllerTest {
         String email = "user@test.com";
 
         AddCustomHabitDtoRequest request = AddCustomHabitDtoRequest.builder()
-                .complexity(2)
-                .defaultDuration(14)
-                .tagIds(Set.of(1L))
-                .build();
+            .complexity(2)
+            .defaultDuration(14)
+            .tagIds(Set.of(1L))
+            .build();
 
         MockMultipartFile requestPart = new MockMultipartFile(
-                "request",
-                "request.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(request)
-        );
+            "request",
+            "request.json",
+            MediaType.APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsBytes(request));
 
         MockMultipartFile imagePart = new MockMultipartFile(
-                "image",
-                "habit.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "x".getBytes(StandardCharsets.UTF_8)
-        );
+            "image",
+            "habit.png",
+            MediaType.IMAGE_PNG_VALUE,
+            "x".getBytes(StandardCharsets.UTF_8));
 
         when(habitService.addCustomHabit(
-                any(AddCustomHabitDtoRequest.class),
-                any(MultipartFile.class),
-                eq(email)))
-                .thenThrow(NotFoundException.class);
+            any(AddCustomHabitDtoRequest.class),
+            any(MultipartFile.class),
+            eq(email)))
+            .thenThrow(NotFoundException.class);
 
         mockMvc.perform(multipart(HABIT_PATH + "/custom")
-                        .file(requestPart)
-                        .file(imagePart)
-                        .principal(() -> email)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isNotFound());
+            .file(requestPart)
+            .file(imagePart)
+            .principal(() -> email)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isNotFound());
 
         verify(habitService).addCustomHabit(
-                any(AddCustomHabitDtoRequest.class),
-                any(MultipartFile.class),
-                eq(email));
+            any(AddCustomHabitDtoRequest.class),
+            any(MultipartFile.class),
+            eq(email));
         verifyNoMoreInteractions(habitService);
     }
 
@@ -795,29 +777,29 @@ class HabitControllerTest {
         when(userService.findByEmail(email)).thenReturn(userVO);
 
         UserProfilePictureDto dto1 = UserProfilePictureDto.builder()
-                .id(100L)
-                .name("Alice")
-                .profilePicturePath("path-1")
-                .build();
+            .id(100L)
+            .name("Alice")
+            .profilePicturePath("path-1")
+            .build();
 
         UserProfilePictureDto dto2 = UserProfilePictureDto.builder()
-                .id(200L)
-                .name("Bob")
-                .profilePicturePath("path-2")
-                .build();
+            .id(200L)
+            .name("Bob")
+            .profilePicturePath("path-2")
+            .build();
 
         when(habitService.getFriendsAssignedToHabitProfilePictures(habitId, 42L))
-                .thenReturn(List.of(dto1, dto2));
+            .thenReturn(List.of(dto1, dto2));
 
         mockMvc.perform(get(HABIT_PATH + "/{habitId}/friends/profile-pictures", habitId)
-                        .principal(() -> email))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[*].id", containsInAnyOrder(100, 200)))
-                .andExpect(jsonPath("$[*].profilePicturePath",
-                        containsInAnyOrder("path-1", "path-2")));
+            .principal(() -> email))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[*].id", containsInAnyOrder(100, 200)))
+            .andExpect(jsonPath("$[*].profilePicturePath",
+                containsInAnyOrder("path-1", "path-2")));
 
         verify(userService).findByEmail(email);
         verify(habitService).getFriendsAssignedToHabitProfilePictures(habitId, 42L);
@@ -827,14 +809,15 @@ class HabitControllerTest {
     @Test
     void getFriendsAssignedToHabitProfilePictures_ShouldReturnBadRequest_WhenHabitIdIsNotLong() throws Exception {
         mockMvc.perform(get(HABIT_PATH + "/{habitId}/friends/profile-pictures", "invalid-id")
-                        .principal(() -> "user@test.com"))
-                .andExpect(status().isBadRequest());
+            .principal(() -> "user@test.com"))
+            .andExpect(status().isBadRequest());
 
         verifyNoInteractions(habitService, tagsService, userService, modelMapper);
     }
 
     @Test
-    void getFriendsAssignedToHabitProfilePictures_ShouldReturnNotFound_WhenServiceThrowsNotFoundException() throws Exception {
+    void getFriendsAssignedToHabitProfilePictures_ShouldReturnNotFound_WhenServiceThrowsNotFoundException()
+        throws Exception {
         String email = "user@test.com";
         long habitId = 999L;
 
@@ -844,11 +827,11 @@ class HabitControllerTest {
         when(userService.findByEmail(email)).thenReturn(userVO);
 
         when(habitService.getFriendsAssignedToHabitProfilePictures(habitId, 42L))
-                .thenThrow(NotFoundException.class);
+            .thenThrow(NotFoundException.class);
 
         mockMvc.perform(get(HABIT_PATH + "/{habitId}/friends/profile-pictures", habitId)
-                        .principal(() -> email))
-                .andExpect(status().isNotFound());
+            .principal(() -> email))
+            .andExpect(status().isNotFound());
 
         verify(userService).findByEmail(email);
         verify(habitService).getFriendsAssignedToHabitProfilePictures(habitId, 42L);
