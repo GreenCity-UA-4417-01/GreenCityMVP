@@ -25,7 +25,6 @@ public class AddEcoNewsDtoRequestMapper extends AbstractConverter<AddEcoNewsDtoR
             .source(addEcoNewsDtoRequest.getSource())
             .title(addEcoNewsDtoRequest.getTitle())
             .text(addEcoNewsDtoRequest.getText())
-            .shortInfo(addEcoNewsDtoRequest.getShortInfo())
             .creationDate(ZonedDateTime.now())
             .build();
     }
