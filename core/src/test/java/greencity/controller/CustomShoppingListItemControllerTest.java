@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @ExtendWith(MockitoExtension.class)
 class CustomShoppingListItemControllerTest {
     private static final String BASE_URL = "/custom/shopping-list-items";
@@ -43,8 +42,8 @@ class CustomShoppingListItemControllerTest {
         objectMapper = new ObjectMapper();
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
-                .build();
+            .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
+            .build();
     }
 
     @Test
@@ -53,11 +52,11 @@ class CustomShoppingListItemControllerTest {
         long habitId = 2L;
 
         when(customShoppingListItemService
-                .findAllAvailableCustomShoppingListItems(userId, habitId))
-                .thenReturn(Collections.emptyList());
+            .findAllAvailableCustomShoppingListItems(userId, habitId))
+            .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get(BASE_URL + "/{userId}/{habitId}", userId, habitId))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
 
         verify(customShoppingListItemService).findAllAvailableCustomShoppingListItems(userId, habitId);
     }
@@ -65,7 +64,7 @@ class CustomShoppingListItemControllerTest {
     @Test
     void getAllAvailableCustomShoppingListItemsWhenUserIdIsInvalid_ReturnsBadRequest() throws Exception {
         mockMvc.perform(get(BASE_URL + "/abc/1"))
-                .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -77,12 +76,12 @@ class CustomShoppingListItemControllerTest {
         BulkSaveCustomShoppingListItemDto bulkDto = new BulkSaveCustomShoppingListItemDto(List.of(itemDto));
 
         when(customShoppingListItemService.save(bulkDto, userId, habitAssignId))
-                .thenReturn(Collections.emptyList());
+            .thenReturn(Collections.emptyList());
 
-        mockMvc.perform(post(BASE_URL+ "/{userId}/{habitAssignId}/custom-shopping-list-items", userId, habitAssignId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bulkDto)))
-                .andExpect(status().isCreated());
+        mockMvc.perform(post(BASE_URL + "/{userId}/{habitAssignId}/custom-shopping-list-items", userId, habitAssignId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(bulkDto)))
+            .andExpect(status().isCreated());
 
         verify(customShoppingListItemService).save(bulkDto, userId, habitAssignId);
     }
@@ -93,12 +92,13 @@ class CustomShoppingListItemControllerTest {
         Long habitAssignId = 2L;
 
         CustomShoppingListItemSaveRequestDto invalidItemDto = new CustomShoppingListItemSaveRequestDto("");
-        BulkSaveCustomShoppingListItemDto invalidBulkDto = new BulkSaveCustomShoppingListItemDto(List.of(invalidItemDto));
+        BulkSaveCustomShoppingListItemDto invalidBulkDto =
+            new BulkSaveCustomShoppingListItemDto(List.of(invalidItemDto));
 
-        mockMvc.perform(post(BASE_URL+ "/{userId}/{habitAssignId}/custom-shopping-list-items", userId, habitAssignId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidBulkDto)))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post(BASE_URL + "/{userId}/{habitAssignId}/custom-shopping-list-items", userId, habitAssignId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(invalidBulkDto)))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -107,12 +107,11 @@ class CustomShoppingListItemControllerTest {
         CustomShoppingListItemSaveRequestDto itemDto = new CustomShoppingListItemSaveRequestDto("Test item");
         BulkSaveCustomShoppingListItemDto bulkDto = new BulkSaveCustomShoppingListItemDto(List.of(itemDto));
 
-        mockMvc.perform(post(BASE_URL+ "/abc/{habitAssignId}/custom-shopping-list-items", habitAssignId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bulkDto)))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post(BASE_URL + "/abc/{habitAssignId}/custom-shopping-list-items", habitAssignId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(bulkDto)))
+            .andExpect(status().isBadRequest());
     }
-
 
     @Test
     void updateItemStatusReturnsOk() throws Exception {
@@ -121,17 +120,16 @@ class CustomShoppingListItemControllerTest {
         String status = "DONE";
 
         when(customShoppingListItemService.updateItemStatus(userId, itemId, status))
-                .thenReturn(null);
+            .thenReturn(null);
 
         mockMvc.perform(
-                        patch(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
-                                .param("itemId", itemId.toString())
-                                .param("status", status)
-                )
-                .andExpect(status().isOk());
+            patch(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
+                .param("itemId", itemId.toString())
+                .param("status", status))
+            .andExpect(status().isOk());
 
         verify(customShoppingListItemService)
-                .updateItemStatus(userId, itemId, status);
+            .updateItemStatus(userId, itemId, status);
     }
 
     @Test
@@ -139,20 +137,18 @@ class CustomShoppingListItemControllerTest {
         Long userId = 1L;
 
         mockMvc.perform(
-                        patch(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
-                                .param("status", "DONE")
-                )
-                .andExpect(status().isBadRequest());
+            patch(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
+                .param("status", "DONE"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
     void updateItemStatusWhenUserIdInvalidReturnsBadRequest() throws Exception {
         mockMvc.perform(
-                        patch(BASE_URL + "/abc/custom-shopping-list-items")
-                                .param("itemId", "10")
-                                .param("status", "DONE")
-                )
-                .andExpect(status().isBadRequest());
+            patch(BASE_URL + "/abc/custom-shopping-list-items")
+                .param("itemId", "10")
+                .param("status", "DONE"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -161,10 +157,9 @@ class CustomShoppingListItemControllerTest {
         Long itemId = 10L;
 
         mockMvc.perform(patch(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
-                        .param("itemId", itemId.toString()))
-                .andExpect(status().isBadRequest());
+            .param("itemId", itemId.toString()))
+            .andExpect(status().isBadRequest());
     }
-
 
     @Test
     void updateItemStatusToDoneReturnsOk() throws Exception {
@@ -172,13 +167,12 @@ class CustomShoppingListItemControllerTest {
         Long itemId = 10L;
 
         mockMvc.perform(
-                        patch(BASE_URL + "/{userId}/done", userId)
-                                .param("itemId", itemId.toString())
-                )
-                .andExpect(status().isOk());
+            patch(BASE_URL + "/{userId}/done", userId)
+                .param("itemId", itemId.toString()))
+            .andExpect(status().isOk());
 
         verify(customShoppingListItemService)
-                .updateItemStatusToDone(userId, itemId);
+            .updateItemStatusToDone(userId, itemId);
     }
 
     @Test
@@ -186,18 +180,16 @@ class CustomShoppingListItemControllerTest {
         Long userId = 1L;
 
         mockMvc.perform(
-                        patch(BASE_URL + "/{userId}/done", userId)
-                )
-                .andExpect(status().isBadRequest());
+            patch(BASE_URL + "/{userId}/done", userId))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
     void updateItemStatusToDoneWhenUserIdInvalidReturnsBadRequest() throws Exception {
         mockMvc.perform(
-                        patch(BASE_URL + "/abc/done")
-                                .param("itemId", "10")
-                )
-                .andExpect(status().isBadRequest());
+            patch(BASE_URL + "/abc/done")
+                .param("itemId", "10"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -206,13 +198,12 @@ class CustomShoppingListItemControllerTest {
         String ids = "1,2,3";
 
         when(customShoppingListItemService.bulkDelete(ids))
-                .thenReturn(List.of(1L, 2L, 3L));
+            .thenReturn(List.of(1L, 2L, 3L));
 
         mockMvc.perform(
-                        delete(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
-                                .param("ids", ids)
-                )
-                .andExpect(status().isOk());
+            delete(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
+                .param("ids", ids))
+            .andExpect(status().isOk());
 
         verify(customShoppingListItemService).bulkDelete(ids);
     }
@@ -222,18 +213,16 @@ class CustomShoppingListItemControllerTest {
         Long userId = 1L;
 
         mockMvc.perform(
-                        delete(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
-                )
-                .andExpect(status().isBadRequest());
+            delete(BASE_URL + "/{userId}/custom-shopping-list-items", userId))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
     void bulkDeleteCustomShoppingListItemsWhenUserIdInvalidReturnsBadRequest() throws Exception {
         mockMvc.perform(
-                        delete(BASE_URL + "/abc/custom-shopping-list-items")
-                                .param("ids", "1,2")
-                )
-                .andExpect(status().isBadRequest());
+            delete(BASE_URL + "/abc/custom-shopping-list-items")
+                .param("ids", "1,2"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -242,11 +231,11 @@ class CustomShoppingListItemControllerTest {
         String status = "ACTIVE";
 
         when(customShoppingListItemService.findAllUsersCustomShoppingListItemsByStatus(userId, status))
-                .thenReturn(Collections.emptyList());
+            .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
-                        .param("status", status))
-                .andExpect(status().isOk());
+            .param("status", status))
+            .andExpect(status().isOk());
 
         verify(customShoppingListItemService).findAllUsersCustomShoppingListItemsByStatus(userId, status);
     }
@@ -256,19 +245,18 @@ class CustomShoppingListItemControllerTest {
         Long userId = 1L;
 
         when(customShoppingListItemService.findAllUsersCustomShoppingListItemsByStatus(userId, null))
-                .thenReturn(Collections.emptyList());
+            .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get(BASE_URL + "/{userId}/custom-shopping-list-items", userId))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
 
         verify(customShoppingListItemService).findAllUsersCustomShoppingListItemsByStatus(userId, null);
     }
 
-
     @Test
     void getAllCustomShoppingItemsByStatusWithInvalidUserIdReturnsBadRequest() throws Exception {
-        mockMvc.perform(get( BASE_URL + "/abc/custom-shopping-list-items"))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(get(BASE_URL + "/abc/custom-shopping-list-items"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -277,11 +265,11 @@ class CustomShoppingListItemControllerTest {
         String invalidStatus = "INVALID";
 
         when(customShoppingListItemService.findAllUsersCustomShoppingListItemsByStatus(userId, invalidStatus))
-                .thenReturn(Collections.emptyList());
+            .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get(BASE_URL + "/{userId}/custom-shopping-list-items", userId)
-                        .param("status", invalidStatus))
-                .andExpect(status().isOk());
+            .param("status", invalidStatus))
+            .andExpect(status().isOk());
 
         verify(customShoppingListItemService).findAllUsersCustomShoppingListItemsByStatus(userId, invalidStatus);
     }

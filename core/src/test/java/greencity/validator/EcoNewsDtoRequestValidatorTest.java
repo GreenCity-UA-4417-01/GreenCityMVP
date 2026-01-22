@@ -64,7 +64,8 @@ class EcoNewsDtoRequestValidatorTest {
 
     @ParameterizedTest
     @MethodSource("provideInvalidTestData")
-    void isValid_ShouldThrowWrongCountOfTagsException_WhenInvalidTags(String source, int numberOfTags, int urlValidatorCalls) {
+    void isValid_ShouldThrowWrongCountOfTagsException_WhenInvalidTags(String source, int numberOfTags,
+        int urlValidatorCalls) {
         // given
         this.request.setSource(source);
         this.request.setTags(createTagsList(numberOfTags));
@@ -74,8 +75,8 @@ class EcoNewsDtoRequestValidatorTest {
             urlValidator.when(() -> UrlValidator.isUrlValid(eq(this.request.getSource()))).thenReturn(true);
 
             assertThatThrownBy(() -> validator.isValid(this.request, context))
-                    .isInstanceOf(WrongCountOfTagsException.class)
-                    .hasMessage(ERR_MSG);
+                .isInstanceOf(WrongCountOfTagsException.class)
+                .hasMessage(ERR_MSG);
             urlValidator.verify(() -> UrlValidator.isUrlValid(this.request.getSource()), times(urlValidatorCalls));
         }
     }
@@ -100,34 +101,32 @@ class EcoNewsDtoRequestValidatorTest {
 
     private static Stream<Arguments> provideValidTestData() {
         return Stream.of(
-                Arguments.of("https://example.com", 1, 1),
-                Arguments.of("https://example.com", 2, 1),
-                Arguments.of("https://example.com", MAX_TAGS_QTY, 1),
-                Arguments.of("   ", 1, 1),
-                Arguments.of("   ", 2, 1),
-                Arguments.of("   ", MAX_TAGS_QTY, 1),
-                // With empty source
-                Arguments.of("", 1, 0),
-                Arguments.of("", 2, 0),
-                Arguments.of("", MAX_TAGS_QTY, 0),
-                // With null source
-                Arguments.of(null, 1, 0),
-                Arguments.of(null, 2, 0),
-                Arguments.of(null, MAX_TAGS_QTY, 0)
-        );
+            Arguments.of("https://example.com", 1, 1),
+            Arguments.of("https://example.com", 2, 1),
+            Arguments.of("https://example.com", MAX_TAGS_QTY, 1),
+            Arguments.of("   ", 1, 1),
+            Arguments.of("   ", 2, 1),
+            Arguments.of("   ", MAX_TAGS_QTY, 1),
+            // With empty source
+            Arguments.of("", 1, 0),
+            Arguments.of("", 2, 0),
+            Arguments.of("", MAX_TAGS_QTY, 0),
+            // With null source
+            Arguments.of(null, 1, 0),
+            Arguments.of(null, 2, 0),
+            Arguments.of(null, MAX_TAGS_QTY, 0));
     }
 
     private static Stream<Arguments> provideInvalidTestData() {
         return Stream.of(
-                Arguments.of("https://example.com", 0, 1),
-                Arguments.of("https://example.com", MAX_TAGS_QTY + 1, 1),
-                // With empty source
-                Arguments.of("", 0, 0),
-                Arguments.of("", MAX_TAGS_QTY + 1, 0),
-                // With null source
-                Arguments.of(null, 0, 0),
-                Arguments.of(null, MAX_TAGS_QTY + 1, 0)
-        );
+            Arguments.of("https://example.com", 0, 1),
+            Arguments.of("https://example.com", MAX_TAGS_QTY + 1, 1),
+            // With empty source
+            Arguments.of("", 0, 0),
+            Arguments.of("", MAX_TAGS_QTY + 1, 0),
+            // With null source
+            Arguments.of(null, 0, 0),
+            Arguments.of(null, MAX_TAGS_QTY + 1, 0));
     }
 
     static Stream<Throwable> provideUrlValidatorExceptions() {
@@ -138,7 +137,7 @@ class EcoNewsDtoRequestValidatorTest {
 
     private List<String> createTagsList(int numberOfTags) {
         return IntStream.rangeClosed(1, numberOfTags)
-                .mapToObj(i -> "tag" + i)
-                .collect(Collectors.toList());
+            .mapToObj(i -> "tag" + i)
+            .collect(Collectors.toList());
     }
 }
