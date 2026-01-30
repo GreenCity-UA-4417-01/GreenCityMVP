@@ -272,6 +272,12 @@ public class EcoNewsController {
                     )
             ),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403",
+                    description = HttpStatuses.FORBIDDEN,
+                    content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ExceptionResponse.class))
+        ),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @DeleteMapping("/{econewsId}")
