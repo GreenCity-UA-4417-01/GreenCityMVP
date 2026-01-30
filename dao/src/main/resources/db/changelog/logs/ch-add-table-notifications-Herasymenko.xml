@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="dherasymenko-300126-1" author="Dmytro Herasymenko">
+
+        <createTable tableName="notifications">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="receiver_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="author_id" type="BIGINT"/>
+
+            <column name="object_name" type="VARCHAR(255)"/>
+
+            <column name="action_type" type="VARCHAR(255)"/>
+
+            <column name="is_read" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="creation_date" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- FK to users table -->
+        <addForeignKeyConstraint
+                baseTableName="notifications"
+                baseColumnNames="receiver_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                constraintName="fk_notifications_receiver"/>
+
+        <addForeignKeyConstraint
+                baseTableName="notifications"
+                baseColumnNames="author_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                constraintName="fk_notifications_author"/>
+
+    </changeSet>
+
+</databaseChangeLog>
