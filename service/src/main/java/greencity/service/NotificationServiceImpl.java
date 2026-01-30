@@ -1,13 +1,16 @@
 package greencity.service;
 
 import greencity.dto.notification.NotificationDto;
+import greencity.dto.user.UserVO;
 import greencity.entity.Notification;
+import greencity.entity.User;
 import greencity.repository.NotificationRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepo notificationRepo;
+    private final ModelMapper modelMapper;
 
     @Override
     public List<NotificationDto> getAllNotifications(Long userId) {
@@ -24,6 +28,21 @@ public class NotificationServiceImpl implements NotificationService {
         return notifications.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void createNotification(UserVO receiver, UserVO author, String objectName, String actionType) {
+        Notification notification = Notification.builder()
+                .receiver(modelMapper.map(receiver, User.class))
+                .author(modelMapper.map(author, User.class))
+                .objectName(objectName)
+                .actionType(actionType)
+                .creationDate(ZonedDateTime.now())
+                .isRead(false)
+                .build();
+
+        notificationRepo.save(notification);
     }
 
     private NotificationDto toDto(Notification notification) {

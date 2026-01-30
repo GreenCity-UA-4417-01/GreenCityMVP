@@ -38,6 +38,7 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
     private final greencity.rating.RatingCalculation ratingCalculation;
     private final HttpServletRequest httpServletRequest;
     private final EcoNewsRepo ecoNewsRepo;
+    private final NotificationService notificationService;
 
     /**
      * Method to save {@link greencity.entity.EcoNewsComment}.
@@ -192,13 +193,22 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
     @Override
     public void like(Long id, UserVO userVO) {
         EcoNewsComment comment = ecoNewsCommentRepo.findById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION));
         EcoNewsCommentVO ecoNewsCommentVO = modelMapper.map(comment, EcoNewsCommentVO.class);
         if (comment.getUsersLiked().stream()
-            .anyMatch(user -> user.getId().equals(userVO.getId()))) {
+                .anyMatch(user -> user.getId().equals(userVO.getId()))) {
             ecoNewsService.unlikeComment(userVO, ecoNewsCommentVO);
+
         } else {
             ecoNewsService.likeComment(userVO, ecoNewsCommentVO);
+            if (!comment.getUser().getId().equals(userVO.getId())) {
+                notificationService.createNotification(
+                        modelMapper.map(comment.getUser(), UserVO.class),
+                        userVO,
+                        comment.getEcoNews().getTitle(),
+                        "LIKED_NEWS_COMMENT"
+                );
+            }
         }
         ecoNewsCommentRepo.save(modelMapper.map(ecoNewsCommentVO, EcoNewsComment.class));
     }
