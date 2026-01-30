@@ -65,14 +65,12 @@ class NotificationControllerTest {
     @BeforeEach
     void setUp() {
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(notificationController)
-                .setCustomArgumentResolvers(
-                        new UserArgumentResolver(userService, modelMapper)
-                )
-                .setControllerAdvice(
-                        new CustomExceptionHandler(errorAttributes, objectMapper)
-                )
-                .build();
+            .standaloneSetup(notificationController)
+            .setCustomArgumentResolvers(
+                new UserArgumentResolver(userService, modelMapper))
+            .setControllerAdvice(
+                new CustomExceptionHandler(errorAttributes, objectMapper))
+            .build();
     }
 
     @Test
@@ -82,11 +80,11 @@ class NotificationControllerTest {
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(notificationService.getAllNotifications(userVO.getId()))
-                .thenReturn(notifications);
+            .thenReturn(notifications);
 
         mockMvc.perform(get(notificationsLink)
-                        .principal(principal))
-                .andExpect(status().isOk());
+            .principal(principal))
+            .andExpect(status().isOk());
 
         verify(notificationService).getAllNotifications(userVO.getId());
     }
@@ -97,9 +95,9 @@ class NotificationControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
         mockMvc.perform(delete(notificationsLink + "/{id}", 1L)
-                        .principal(principal)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
 
         verify(notificationService).deleteNotification(1L, userVO.getId());
     }
@@ -110,13 +108,13 @@ class NotificationControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(userVO);
 
         doThrow(NotFoundException.class)
-                .when(notificationService)
-                .deleteNotification(anyLong(), anyLong());
+            .when(notificationService)
+            .deleteNotification(anyLong(), anyLong());
 
         mockMvc.perform(delete(notificationsLink + "/{id}", 1L)
-                        .principal(principal)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
 
         verify(notificationService).deleteNotification(1L, userVO.getId());
     }

@@ -5,10 +5,8 @@ import greencity.entity.Notification;
 import greencity.exception.exceptions.NotDeletedException;
 import greencity.repository.NotificationRepo;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,24 +21,24 @@ public class NotificationServiceImpl implements NotificationService {
         List<Notification> notifications = notificationRepo.findAllByReceiverIdOrderByCreationDateDesc(userId);
 
         return notifications.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+            .map(this::toDto)
+            .collect(Collectors.toList());
     }
 
     private NotificationDto toDto(Notification notification) {
         return NotificationDto.builder()
-                .id(notification.getId())
-                .authorName(notification.getAuthor().getName())
-                .actionType(notification.getActionType())
-                .objectName(notification.getObjectName())
-                .creationDate(notification.getCreationDate())
-                .isRead(notification.isRead())
-                .build();
+            .id(notification.getId())
+            .authorName(notification.getAuthor().getName())
+            .actionType(notification.getActionType())
+            .objectName(notification.getObjectName())
+            .creationDate(notification.getCreationDate())
+            .isRead(notification.isRead())
+            .build();
     }
 
     @Override
     @Transactional
-    public void deleteNotification(Long notificationId, Long userId){
+    public void deleteNotification(Long notificationId, Long userId) {
         int deletedCount = notificationRepo.deleteByIdAndReceiverId(notificationId, userId);
         if (deletedCount == 0) {
             throw new NotDeletedException("Notification not found or doesn't belong to user");
