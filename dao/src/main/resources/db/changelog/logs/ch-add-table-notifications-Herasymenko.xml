@@ -44,6 +44,10 @@
                 referencedColumnNames="id"
                 constraintName="fk_notifications_author"/>
 
+        <rollback>
+            <dropTable tableName="notifications"/>
+        </rollback>
+
     </changeSet>
 
 </databaseChangeLog>
