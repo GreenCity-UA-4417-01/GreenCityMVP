@@ -4,6 +4,7 @@ import greencity.dto.notification.NotificationDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Notification;
 import greencity.entity.User;
+import greencity.exception.exceptions.NotDeletedException;
 import greencity.repository.NotificationRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -54,5 +55,14 @@ public class NotificationServiceImpl implements NotificationService {
                 .creationDate(notification.getCreationDate())
                 .isRead(notification.isRead())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void deleteNotification(Long notificationId, Long userId){
+        int deletedCount = notificationRepo.deleteByIdAndReceiverId(notificationId, userId);
+        if (deletedCount == 0) {
+            throw new NotDeletedException("Notification not found or doesn't belong to user");
+        }
     }
 }
