@@ -42,7 +42,6 @@ public class FriendshipController {
     @GetMapping("/getCountOfFriendships")
     public ResponseEntity<CountOfFriendsDto> getCountOfFriendshipsByStatus(
         @Parameter(hidden = true) @CurrentUser UserVO userVO) {
-
         return ResponseEntity.ok(
             new CountOfFriendsDto(
                 friendshipService.countByUserIdAndStatus(userVO.getId())));
