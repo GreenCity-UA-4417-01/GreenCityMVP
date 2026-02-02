@@ -44,6 +44,6 @@ public class FriendshipController {
         @Parameter(hidden = true) @CurrentUser UserVO userVO) {
         return ResponseEntity.ok(
             new CountOfFriendsDto(
-                friendshipService.countByUserIdAndStatus(userVO.getId())));
+                friendshipService.countByUserId(userVO.getId())));
     }
 }
