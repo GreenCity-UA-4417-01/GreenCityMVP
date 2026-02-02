@@ -1,11 +1,9 @@
 package greencity.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.user.UserVO;
 import greencity.service.FriendshipService;
 import greencity.service.UserService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,22 +42,14 @@ public class FriendshipControllerTest {
     @InjectMocks
     private FriendshipController friendshipController;
 
-    private static ObjectMapper objectMapper;
-
     private final Principal principal = getPrincipal();
-
-    @BeforeAll
-    static void initObjectMapper() {
-        objectMapper = new ObjectMapper()
-                .findAndRegisterModules();
-    }
 
     @BeforeEach
     void setup() {
         this.mockMvc = MockMvcBuilders.standaloneSetup(friendshipController)
-                .setCustomArgumentResolvers(
-                        new UserArgumentResolver(userService, modelMapper))
-                .build();
+            .setCustomArgumentResolvers(
+                new UserArgumentResolver(userService, modelMapper))
+            .build();
     }
 
     @Test
@@ -67,14 +57,14 @@ public class FriendshipControllerTest {
         UserVO userVO = getUserVO();
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
-        when(friendshipService.countByUserIdAndStatus(userVO.getId())).thenReturn(1L);
+        when(friendshipService.countByUserId(userVO.getId())).thenReturn(1L);
 
         mockMvc.perform(get("/friendship/getCountOfFriendships")
-                .principal(principal)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.friendshipCount").value(1));
+            .principal(principal)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.friendshipCount").value(1));
 
-        verify(friendshipService).countByUserIdAndStatus(userVO.getId());
+        verify(friendshipService).countByUserId(userVO.getId());
     }
 }
