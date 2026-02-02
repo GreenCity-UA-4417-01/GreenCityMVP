@@ -40,7 +40,7 @@ public class FriendshipController {
             content = @Content(schema = @Schema))
     })
     @GetMapping("/getCountOfFriendships")
-    public ResponseEntity<CountOfFriendsDto> getCountOfFriendshipsByStatus(
+    public ResponseEntity<CountOfFriendsDto> getCountOfFriendshipsForUser(
         @Parameter(hidden = true) @CurrentUser UserVO userVO) {
         return ResponseEntity.ok(
             new CountOfFriendsDto(
