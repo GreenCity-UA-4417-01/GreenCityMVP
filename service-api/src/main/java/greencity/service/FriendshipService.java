@@ -7,5 +7,5 @@ public interface FriendshipService {
      * @param userId the user's id
      * @return number of friendships
      */
-    Long countByUserIdAndStatus(Long userId);
+    Long countByUserId(Long userId);
 }

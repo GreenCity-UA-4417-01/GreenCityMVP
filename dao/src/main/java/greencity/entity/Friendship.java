@@ -1,6 +1,5 @@
 package greencity.entity;
 
-import greencity.enums.FriendshipStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -25,10 +24,6 @@ public class Friendship {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "friend_id", nullable = false)
     private User friend;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private FriendshipStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
