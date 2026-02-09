@@ -50,7 +50,9 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="invite_scope" type="varchar(10)" defaultValue="ALL"/>
+            <column name="invite_scope" type="varchar(10)" defaultValue="ALL">
+                <constraints nullable="false"/>
+            </column>
 
             <column name="created_at" type="timestamp with time zone" defaultValueComputed="NOW()">
                 <constraints nullable="false"/>
