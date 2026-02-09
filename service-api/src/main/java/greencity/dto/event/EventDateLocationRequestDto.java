@@ -1,5 +1,7 @@
 package greencity.dto.event;
 
+import greencity.annotations.ValidEventDateTimeRange;
+import greencity.annotations.ValidEventLocation;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -11,6 +13,8 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ValidEventDateTimeRange
+@ValidEventLocation
 public class EventDateLocationRequestDto {
     @NotNull
     private OffsetDateTime startDateTime;
