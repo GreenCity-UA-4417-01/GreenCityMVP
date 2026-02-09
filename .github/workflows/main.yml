@@ -41,7 +41,7 @@ jobs:
       - name: Build, test, JaCoCo report, SonarCloud analysis
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_MVP }}
         run: |
           mvn clean verify jacoco:report sonar:sonar \
           -Dsonar.projectKey=GreenCity-UA-4417-01_GreenCityMVP \
