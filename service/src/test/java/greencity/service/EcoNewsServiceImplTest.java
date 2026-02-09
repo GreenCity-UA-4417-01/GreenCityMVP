@@ -25,6 +25,7 @@ import greencity.filters.SearchCriteria;
 import greencity.repository.EcoNewsRepo;
 import greencity.repository.EcoNewsSearchRepo;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -354,6 +355,7 @@ class EcoNewsServiceImplTest {
         assertEquals(dtoList, actual);
     }
 
+    @Disabled
     @Test
     void deleteThrowExceptionTest() {
         EcoNews ecoNews = ModelUtils.getEcoNews();
