@@ -47,7 +47,11 @@ public class Event {
     /**
      * DB sets NOW() (defaultValueComputed), so we treat it as DB-generated.
      */
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "timestamp with time zone")
+    @Column(name = "created_at",
+        nullable = false,
+        updatable = false,
+        insertable = false,
+        columnDefinition = "timestamp with time zone")
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false, columnDefinition = "timestamp with time zone")
@@ -68,4 +72,14 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<EventImage> images = new HashSet<>();
+
+    @PrePersist
+    void prePersist() {
+        updatedAt = OffsetDateTime.now();
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        updatedAt = OffsetDateTime.now();
+    }
 }
