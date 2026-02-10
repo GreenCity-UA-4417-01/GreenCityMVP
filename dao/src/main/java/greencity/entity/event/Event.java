@@ -5,7 +5,9 @@ import greencity.enums.InviteScope;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -71,7 +73,7 @@ public class Event {
     private Set<EventDateTimeLocation> dateTimeLocations = new HashSet<>();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<EventImage> images = new HashSet<>();
+    private List<EventImage> images = new ArrayList<>();
 
     @PrePersist
     void prePersist() {
