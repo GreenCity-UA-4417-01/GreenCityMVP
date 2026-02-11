@@ -46,13 +46,9 @@ public class EventController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDto> create(
-            @Parameter(
-                description = "Event create request (JSON part)",
-                required = true,
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(
-                        implementation = AddEventDtoRequest.class))) @RequestPart("addEventDtoRequest") @Valid AddEventDtoRequest request,
+        @Parameter(
+            description = "Event create request (JSON part)",
+            required = true) @RequestPart("addEventDtoRequest") @Valid AddEventDtoRequest request,
         @Parameter(
             description = "Images (optional, multiple). Allowed: JPG/PNG. Max 5 files.",
             array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))) @RequestPart(value = "images",
