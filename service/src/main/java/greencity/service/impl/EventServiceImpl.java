@@ -27,10 +27,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
-    private static final int MAX_IMAGES = 5;
-    private static final long MAX_IMAGE_BYTES = 10L * 1024 * 1024;
-    private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg", "image/png");
-
     private final EventRepository eventRepository;
     private final InitiativeTypeRepository initiativeTypeRepository;
     private final UserRepo userRepository;
@@ -62,7 +58,7 @@ public class EventServiceImpl implements EventService {
 
         attachDateTimeLocations(event, request.getDatesLocations());
 
-        if (images != null && !images.isEmpty()) {
+        if (images != null && images.stream().anyMatch(f -> f != null && !f.isEmpty())) {
             attachImages(event, images);
         }
 
@@ -116,8 +112,6 @@ public class EventServiceImpl implements EventService {
     }
 
     private void attachImages(Event event, List<MultipartFile> images) {
-        validateImages(images);
-
         boolean mainAssigned = false;
 
         for (MultipartFile file : images) {
@@ -144,35 +138,6 @@ public class EventServiceImpl implements EventService {
             image.setData(data);
 
             event.getImages().add(image);
-        }
-    }
-
-    private void validateImages(List<MultipartFile> images) {
-        long nonEmptyCount = images.stream()
-            .filter(file -> file != null && !file.isEmpty())
-            .count();
-
-        if (nonEmptyCount > MAX_IMAGES) {
-            throw new BadRequestException(
-                "Maximum allowed images count is " + MAX_IMAGES + ". Provided: " + nonEmptyCount);
-        }
-
-        for (MultipartFile file : images) {
-            if (file == null || file.isEmpty()) {
-                continue;
-            }
-
-            String contentType = file.getContentType();
-            if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
-                throw new BadRequestException(
-                    "Unsupported image content type: " + contentType + ". Allowed formats: JPG, PNG");
-            }
-
-            if (file.getSize() > MAX_IMAGE_BYTES) {
-                throw new BadRequestException(
-                    "Incorrect image size. Maximum allowed size is 10 MB. Image '"
-                        + file.getOriginalFilename() + "' is " + (file.getSize() / 1024 / 1024) + " MB");
-            }
         }
     }
 
