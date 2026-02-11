@@ -13,5 +13,6 @@ public class EventImageDto {
     private boolean main;
     private String contentType;
     private String fileName;
+    private String link;
     private OffsetDateTime createdAt;
 }

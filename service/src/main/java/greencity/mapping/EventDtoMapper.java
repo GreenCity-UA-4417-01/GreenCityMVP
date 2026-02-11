@@ -15,6 +15,8 @@ import java.util.Set;
 
 @Component
 public class EventDtoMapper {
+    private static final String EVENT_IMAGE_CONTENT_PATH = "/events/images/content/";
+
     public EventDto toDto(Event event) {
         if (event == null) {
             return null;
@@ -92,12 +94,15 @@ public class EventDtoMapper {
     }
 
     private EventImageDto toImageDto(EventImage img) {
+        Long id = img.getId();
+
         return EventImageDto.builder()
-            .id(img.getId())
+            .id(id)
             .main(img.isMain())
             .contentType(img.getContentType())
             .fileName(img.getFileName())
             .createdAt(img.getCreatedAt())
+            .link(id == null ? null : EVENT_IMAGE_CONTENT_PATH + id)
             .build();
     }
 }

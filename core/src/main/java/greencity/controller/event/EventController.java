@@ -1,4 +1,4 @@
-package greencity.controller;
+package greencity.controller.event;
 
 import greencity.annotations.CurrentUser;
 import greencity.annotations.EventImagesValidation;
