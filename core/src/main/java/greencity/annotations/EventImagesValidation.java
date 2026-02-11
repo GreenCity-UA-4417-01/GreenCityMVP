@@ -11,6 +11,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EventImagesValidation {
     String message() default "Invalid event images";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

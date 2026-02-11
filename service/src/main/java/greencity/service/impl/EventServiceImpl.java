@@ -15,9 +15,11 @@ import greencity.repository.event.InitiativeTypeRepository;
 import greencity.service.EventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -58,8 +60,13 @@ public class EventServiceImpl implements EventService {
 
         attachDateTimeLocations(event, request.getDatesLocations());
 
-        if (images != null && images.stream().anyMatch(f -> f != null && !f.isEmpty())) {
+        boolean hasUploadedImages =
+            images != null && images.stream().anyMatch(f -> f != null && !f.isEmpty());
+
+        if (hasUploadedImages) {
             attachImages(event, images);
+        } else {
+            attachDefaultImage(event);
         }
 
         Event saved = eventRepository.save(event);
@@ -146,6 +153,27 @@ public class EventServiceImpl implements EventService {
             return file.getBytes();
         } catch (IOException e) {
             throw new BadRequestException("Failed to read image bytes from file: " + file.getOriginalFilename());
+        }
+    }
+
+    private void attachDefaultImage(Event event) {
+        try (InputStream is =
+            new ClassPathResource("defaults/greencitydefault.jpg").getInputStream()) {
+            EventImage image = new EventImage();
+            image.setEvent(event);
+            image.setMain(true);
+            image.setContentType("image/jpeg");
+            image.setFileName("greencitydefault.jpg");
+            image.setCreatedAt(OffsetDateTime.now());
+
+            byte[] bytes = is.readAllBytes();
+            EventImageData data = new EventImageData();
+            data.setImage(image);
+            data.setData(bytes);
+            image.setData(data);
+            event.getImages().add(image);
+        } catch (IOException e) {
+            throw new IllegalStateException("Default event image not found", e);
         }
     }
 }
