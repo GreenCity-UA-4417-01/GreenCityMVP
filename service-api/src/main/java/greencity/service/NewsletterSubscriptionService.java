@@ -13,14 +13,14 @@ public interface NewsletterSubscriptionService {
     NewsletterSubscriptionResponseDto save(String email);
 
     /**
-     * Method for getting all emails witch subscription.
+     * Method for getting all emails with subscriptions.
      *
      * @return a list of subscribed email addresses; never {@code null}
      */
     List<String> getAllSubscribedEmails();
 
     /**
-     * Method for deleting newsletter subscription by id.
+     * Method for deleting a newsletter subscription by id.
      *
      * @param newsletterSubscriptionId newsletters subscription's id.
      */
