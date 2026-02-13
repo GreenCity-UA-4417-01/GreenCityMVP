@@ -40,7 +40,7 @@ public class NewsletterSubscriptionServiceTest {
 
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(newsletterSubscriptionController)
-                .setValidator(new LocalValidatorFactoryBean())
+            .setValidator(new LocalValidatorFactoryBean())
             .build();
     }
 
