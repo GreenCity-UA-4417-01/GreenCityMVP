@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,6 +40,7 @@ public class NewsletterSubscriptionServiceTest {
 
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(newsletterSubscriptionController)
+                .setValidator(new LocalValidatorFactoryBean())
             .build();
     }
 
