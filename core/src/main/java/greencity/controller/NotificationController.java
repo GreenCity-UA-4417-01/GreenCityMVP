@@ -3,6 +3,7 @@ package greencity.controller;
 import greencity.annotations.CurrentUser;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.user.UserVO;
+import greencity.enums.NotificationSource;
 import greencity.exception.handler.ExceptionResponse;
 import greencity.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,14 +23,16 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
 
-    @Operation(summary = "Get all notifications for the current user")
+    @Operation(summary = "Get all notifications for the current user with optional filter")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "List of notifications retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<List<NotificationDto>> getAllNotifications(@CurrentUser UserVO userVO) {
-        return ResponseEntity.ok(notificationService.getAllNotifications(userVO.getId()));
+    public ResponseEntity<List<NotificationDto>> getAllNotifications(
+        @io.swagger.v3.oas.annotations.Parameter(hidden = true) @CurrentUser UserVO userVO,
+        @RequestParam(required = false) NotificationSource source) {
+        return ResponseEntity.ok(notificationService.getAllNotifications(userVO.getId(), source));
     }
 
     @Operation(summary = "Delete a notification by its ID for the current user")

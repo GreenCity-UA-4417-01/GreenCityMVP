@@ -45,7 +45,7 @@ class NotificationServiceImplTest {
         when(notificationRepo.findAllByReceiverIdOrderByCreationDateDesc(userId))
             .thenReturn(List.of(notification));
 
-        List<NotificationDto> result = notificationService.getAllNotifications(userId);
+        List<NotificationDto> result = notificationService.getAllNotifications(userId, null);
 
         assertEquals(1, result.size());
 
@@ -67,7 +67,7 @@ class NotificationServiceImplTest {
         when(notificationRepo.findAllByReceiverIdOrderByCreationDateDesc(userId))
             .thenReturn(Collections.emptyList());
 
-        List<NotificationDto> result = notificationService.getAllNotifications(userId);
+        List<NotificationDto> result = notificationService.getAllNotifications(userId, null);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());

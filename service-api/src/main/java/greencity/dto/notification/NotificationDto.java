@@ -1,5 +1,6 @@
 package greencity.dto.notification;
 
+import greencity.enums.NotificationSource;
 import lombok.*;
 import java.time.ZonedDateTime;
 
@@ -12,6 +13,7 @@ public class NotificationDto {
     private String authorName;
     private String actionType;
     private String objectName;
+    private NotificationSource source;
     private ZonedDateTime creationDate;
     private boolean isRead;
 }
