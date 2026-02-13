@@ -213,6 +213,34 @@ class EcoNewsServiceImplTest {
     }
 
     @Test
+    void getTheMostLikedEcoNews() {
+        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+
+        EcoNewsDto ecoNewsDto = EcoNewsDto.builder()
+            .creationDate(zonedDateTime)
+            .imagePath("test image path")
+            .id(1L)
+            .title("test title")
+            .content("content")
+            .shortInfo(null)
+            .author(ModelUtils.getEcoNewsAuthorDto())
+            .tags(Collections.emptyList())
+            .tagsUa(Collections.emptyList())
+            .likes(1)
+            .countComments(0)
+            .build();
+
+        EcoNews ecoNews = ModelUtils.getEcoNews();
+
+        when(ecoNewsRepo.getTheMostLikedEcoNews()).thenReturn(Optional.of(ecoNews));
+        when(modelMapper.map(ecoNews, EcoNewsDto.class)).thenReturn(ecoNewsDto);
+
+        EcoNewsDto actual = ecoNewsService.getTheMostLikedEcoNews();
+
+        assertEquals(ecoNewsDto, actual);
+    }
+
+    @Test
     void findAll() {
         ZonedDateTime now = ZonedDateTime.now();
 

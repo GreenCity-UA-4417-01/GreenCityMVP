@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.notification.EmailNotificationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -35,6 +36,9 @@ public class RestClient {
     @Value("${greencityuser.server.address}")
     private String greenCityUserServerAddress;
     private final HttpServletRequest httpServletRequest;
+
+    @Value("${greencity.user.api.emailSenderKey}")
+    private String internalApiKey;
 
     /**
      * Method for getting all users by their {@link EmailNotification}.
@@ -476,5 +480,19 @@ public class RestClient {
             .findFirst()
             .map(Cookie::getValue).orElse(null);
         return token == null ? null : "Bearer " + token;
+    }
+
+    public void sendUserNotification(EmailNotificationDto emailNotificationDto, String email) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("EmailApiKey", internalApiKey);
+
+        HttpEntity<EmailNotificationDto> entity = new HttpEntity<>(emailNotificationDto, headers);
+
+        restTemplate.exchange(
+            greenCityUserServerAddress + RestTemplateLinks.SEND_NOTIFICATION + "?email=" + email,
+            HttpMethod.POST,
+            entity,
+            Object.class);
     }
 }

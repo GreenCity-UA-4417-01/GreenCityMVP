@@ -46,6 +46,13 @@ public interface EcoNewsService {
     List<EcoNewsDto> getThreeRecommendedEcoNews(Long openedEcoNewsId);
 
     /**
+     * Method for getting eco news with the biggest amount of likes.
+     *
+     * @return {@link EcoNewsDto} instance.
+     */
+    EcoNewsDto getTheMostLikedEcoNews();
+
+    /**
      * Method for getting all eco news by page.
      *
      * @param page parameters of to search.

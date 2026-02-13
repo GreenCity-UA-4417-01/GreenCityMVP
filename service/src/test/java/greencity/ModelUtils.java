@@ -44,6 +44,11 @@ public class ModelUtils {
     public static ZonedDateTime zonedDateTime = ZonedDateTime.now();
     public static LocalDateTime localDateTime = LocalDateTime.now();
 
+    public static NewsletterSubscription getNewsletterSubscription() {
+        return NewsletterSubscription.builder().id(5L).email("test@mail.com").status(EmailSubscriptionStatus.SUBSCRIBED)
+            .createdAt(localDateTime).updatedAt(localDateTime).build();
+    };
+
     public static Tag getTag() {
         return new Tag(1L, TagType.ECO_NEWS, getTagTranslations(), Collections.emptyList(), Collections.emptySet());
     }

@@ -45,6 +45,22 @@ public interface EcoNewsRepo extends JpaRepository<EcoNews, Long>, JpaSpecificat
     List<EcoNews> getThreeRecommendedEcoNews(Long openedEcoNewsId);
 
     /**
+     * Method for getting the most liked eco news in the past week.
+     *
+     * @return {@link EcoNews} with the biggest amount of likes by users, from the
+     *         last week.
+     */
+    @Query(nativeQuery = true,
+        value = "SELECT e.* "
+            + "FROM eco_news AS e "
+            + "LEFT JOIN eco_news_users_likes AS l ON e.id = l.eco_news_id "
+            + "WHERE e.creation_date BETWEEN NOW() - INTERVAL '7 days' AND NOW() "
+            + "GROUP BY e.id "
+            + "ORDER BY COUNT(l.users_id) DESC "
+            + "LIMIT 1")
+    Optional<EcoNews> getTheMostLikedEcoNews();
+
+    /**
      * Method returns {@link EcoNews} for specific tags.
      *
      * @param tags list of tags to search.

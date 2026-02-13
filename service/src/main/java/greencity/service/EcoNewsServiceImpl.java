@@ -157,6 +157,20 @@ public class EcoNewsServiceImpl implements EcoNewsService {
     }
 
     /**
+     * Method for getting eco news with the biggest amount of likes.
+     *
+     * @return {@link EcoNewsDto} instance.
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public EcoNewsDto getTheMostLikedEcoNews() {
+        EcoNews theMostLikedecoNews = ecoNewsRepo.getTheMostLikedEcoNews()
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.ECO_NEWS_NOT_FOUND));
+
+        return modelMapper.map(theMostLikedecoNews, EcoNewsDto.class);
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @author Kovaliv Taras.

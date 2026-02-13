@@ -5,6 +5,7 @@ import greencity.ModelUtils;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.notification.EmailNotificationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.message.SendHabitNotification;
@@ -346,14 +347,44 @@ class RestClientTest {
     @Test
     void sendHabitNotification() {
         SendHabitNotification notification = ModelUtils.getSendHabitNotification();
+
         HttpEntity<SendHabitNotification> entity = new HttpEntity<>(notification, new HttpHeaders());
+
         when(restTemplate.exchange(greenCityUserServerAddress
             + RestTemplateLinks.SEND_HABIT_NOTIFICATION, HttpMethod.POST, entity, Object.class))
             .thenReturn(ResponseEntity.ok(Object));
+
         restClient.sendHabitNotification(notification);
 
         verify(restTemplate).exchange(greenCityUserServerAddress
             + RestTemplateLinks.SEND_HABIT_NOTIFICATION, HttpMethod.POST, entity, Object.class);
+    }
+
+    @Test
+    void sendUserNotification() {
+        EmailNotificationDto notification =
+            EmailNotificationDto.builder()
+                .title("TestTitle")
+                .body("TestBody")
+                .build();
+
+        String url = greenCityUserServerAddress
+            + RestTemplateLinks.SEND_NOTIFICATION
+            + "?email=test@email.com";
+
+        when(restTemplate.exchange(
+            eq(url),
+            eq(HttpMethod.POST),
+            any(HttpEntity.class),
+            eq(Object.class))).thenReturn(ResponseEntity.ok().build());
+
+        restClient.sendUserNotification(notification, "test@email.com");
+
+        verify(restTemplate).exchange(
+            eq(url),
+            eq(HttpMethod.POST),
+            any(HttpEntity.class),
+            eq(Object.class));
     }
 
     @Test
