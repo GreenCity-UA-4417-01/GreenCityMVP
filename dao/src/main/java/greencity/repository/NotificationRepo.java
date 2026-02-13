@@ -1,6 +1,7 @@
 package greencity.repository;
 
 import greencity.entity.Notification;
+import greencity.enums.NotificationSource;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,8 @@ import java.util.List;
 @Repository
 public interface NotificationRepo extends JpaRepository<Notification, Long> {
     List<Notification> findAllByReceiverIdOrderByCreationDateDesc(Long receiverId);
+
+    List<Notification> findAllByReceiverIdAndSourceOrderByCreationDateDesc(Long receiverId, NotificationSource source);
 
     @Modifying
     @Query("DELETE FROM Notification n WHERE n.id = :id AND n.receiver.id = :receiverId")

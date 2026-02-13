@@ -79,14 +79,14 @@ class NotificationControllerTest {
         List<NotificationDto> notifications = Collections.emptyList();
 
         when(userService.findByEmail(anyString())).thenReturn(userVO);
-        when(notificationService.getAllNotifications(userVO.getId()))
+        when(notificationService.getAllNotifications(userVO.getId(), null))
             .thenReturn(notifications);
 
         mockMvc.perform(get(notificationsLink)
             .principal(principal))
             .andExpect(status().isOk());
 
-        verify(notificationService).getAllNotifications(userVO.getId());
+        verify(notificationService).getAllNotifications(userVO.getId(), null);
     }
 
     @Test

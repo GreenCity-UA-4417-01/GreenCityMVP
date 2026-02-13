@@ -1,5 +1,6 @@
 package greencity.entity;
 
+import greencity.enums.NotificationSource;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.ZonedDateTime;
@@ -32,6 +33,10 @@ public class Notification {
 
     @Column(name = "is_read")
     private boolean isRead = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source", nullable = false)
+    private NotificationSource source;
 
     @Column(name = "creation_date", nullable = false)
     private ZonedDateTime creationDate;
