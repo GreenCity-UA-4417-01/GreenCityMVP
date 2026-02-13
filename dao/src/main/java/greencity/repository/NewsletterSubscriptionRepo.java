@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface NewsletterSubscriptionRepo extends JpaRepository<NewsletterSubscription, Long> {
     /**
-     * Method to find {@link NewsletterSubscriptionRepo} by email.
+     * Method to find {@link NewsletterSubscription} by email.
      *
      * @param email email.
      * @return {@link NewsletterSubscription} if exists.
@@ -18,15 +18,15 @@ public interface NewsletterSubscriptionRepo extends JpaRepository<NewsletterSubs
     Optional<NewsletterSubscription> findByEmail(String email);
 
     /**
-     * Method to find all {@link NewsletterSubscriptionRepo} by status.
+     * Method to find all {@link NewsletterSubscription} by status.
      *
-     * @param status email.
+     * @param status status.
      * @return list of {@link NewsletterSubscription}.
      */
     List<NewsletterSubscription> findAllByStatus(EmailSubscriptionStatus status);
 
     /**
-     * Method to find if {@link NewsletterSubscriptionRepo} exists by email.
+     * Method to find if {@link NewsletterSubscription} exists by email.
      *
      * @param email email.
      * @return Boolean.
