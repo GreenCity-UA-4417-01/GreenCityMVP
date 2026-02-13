@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class NewsletterSubscriptionServiceImplTest {
 
     @Mock
@@ -30,8 +30,6 @@ public class NewsletterSubscriptionServiceImplTest {
 
     @InjectMocks
     private NewsletterSubscriptionServiceImpl service;
-
-    private NewsletterSubscription subscription = ModelUtils.getNewsletterSubscription();
 
     @Test
     void save() {
