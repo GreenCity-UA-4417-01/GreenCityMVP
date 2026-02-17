@@ -15,11 +15,9 @@ import greencity.dto.user.UserVO;
 import greencity.entity.EcoNews;
 import greencity.entity.Tag;
 import greencity.entity.User;
+import greencity.enums.Role;
 import greencity.enums.TagType;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.NotSavedException;
-import greencity.exception.exceptions.UnsupportedSortException;
+import greencity.exception.exceptions.*;
 import greencity.filters.EcoNewsSpecification;
 import greencity.filters.SearchCriteria;
 import greencity.repository.EcoNewsRepo;
@@ -496,16 +494,21 @@ class EcoNewsServiceImplTest {
     @Test
     void updateEcoNewsDtoThrowsExceptionTest() {
         EcoNews ecoNews = ModelUtils.getEcoNews();
+
         UserVO user = ModelUtils.getUserVO();
+        user.setRole(Role.ROLE_USER);
+
         ecoNews.getAuthor().setId(2L);
+
         EcoNewsVO ecoNewsVO = ModelUtils.getEcoNewsVO();
-        EcoNewsDto ecoNewsDto = ModelUtils.getEcoNewsDto();
         UpdateEcoNewsDto updateEcoNewsDto = ModelUtils.getUpdateEcoNewsDto();
+
         when(ecoNewsRepo.findById(1L)).thenReturn(Optional.of(ecoNews));
         when(ecoNewsService.findById(1L)).thenReturn(ecoNewsVO);
         when(modelMapper.map(ecoNewsVO, EcoNews.class)).thenReturn(ecoNews);
-        assertThrows(BadRequestException.class, () -> ecoNewsService.update(updateEcoNewsDto, null, user));
 
+        assertThrows(UserHasNoPermissionToAccessException.class,
+            () -> ecoNewsService.update(updateEcoNewsDto, null, user));
     }
 
     @Test
