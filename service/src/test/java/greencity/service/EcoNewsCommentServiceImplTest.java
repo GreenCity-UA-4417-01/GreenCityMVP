@@ -494,4 +494,22 @@ class EcoNewsCommentServiceImplTest {
         PageableDto<EcoNewsCommentDto> actual = ecoNewsCommentService.findAllActiveReplies(pageRequest, 1L, userVO);
         assertEquals(pageableDto, actual);
     }
+
+    @Test
+    void countOfCommentsReturnsCorrectValueTest() {
+        Long ecoNewsId = 1L;
+        EcoNews ecoNews = ModelUtils.getEcoNews();
+
+        when(ecoNewsRepo.findById(ecoNewsId)).thenReturn(Optional.of(ecoNews));
+        when(ecoNewsCommentRepo.countEcoNewsCommentByEcoNews(ecoNews.getId()))
+            .thenReturn(5);
+
+        int result = ecoNewsCommentService.countOfComments(ecoNewsId);
+
+        assertEquals(5, result);
+        verify(ecoNewsRepo, times(1)).findById(ecoNewsId);
+        verify(ecoNewsCommentRepo, times(1))
+            .countEcoNewsCommentByEcoNews(ecoNews.getId());
+    }
+
 }

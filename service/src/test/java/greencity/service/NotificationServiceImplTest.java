@@ -9,11 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.modelmapper.ModelMapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import greencity.dto.user.UserVO;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -24,8 +26,22 @@ class NotificationServiceImplTest {
     @Mock
     private NotificationRepo notificationRepo;
 
+    @Mock
+    private ModelMapper modelMapper;
+
     @InjectMocks
     private NotificationServiceImpl notificationService;
+
+    @Test
+    void createNotificationShouldSaveNotificationTest() {
+        UserVO receiver = UserVO.builder().id(1L).name("Receiver").build();
+        UserVO author = UserVO.builder().id(2L).name("Author").build();
+
+        notificationService.createNotification(receiver, author,
+            "EcoNews title", "LIKE");
+
+        verify(notificationRepo, times(1)).save(any(Notification.class));
+    }
 
     @Test
     void getAllNotificationsShouldReturnListOfDTOsTest() {
