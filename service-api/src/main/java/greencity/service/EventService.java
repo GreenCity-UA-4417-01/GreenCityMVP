@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface EventService {
     EventDto create(AddEventDtoRequest request, List<MultipartFile> images, Long organizerId);
+
+    void delete(Long eventId, Long requesterId);
 }

@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -71,6 +72,15 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         httpClientResponseBody = objectMapper.readValue(ex.getResponseBodyAsString(), responseType);
 
         return httpClientResponseBody;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDenied(
+        AccessDeniedException ex, WebRequest request) {
+        ExceptionResponse response =
+            new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     /**

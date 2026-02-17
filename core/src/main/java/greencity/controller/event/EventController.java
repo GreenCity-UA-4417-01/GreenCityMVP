@@ -19,10 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
@@ -66,5 +63,20 @@ public class EventController {
         @Parameter(hidden = true) @CurrentUser UserVO userVO) {
         EventDto created = eventService.create(request, images, userVO.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @Operation(summary = "Delete an event",
+        description = "Deletes an event by id. Allowed for ADMIN or event organizer.")
+    @ApiResponse(responseCode = "204", description = "Event deleted", content = @Content)
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden - only admin or organizer can delete",
+        content = @Content)
+    @ApiResponse(responseCode = "404", description = "Event not found", content = @Content)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+        @PathVariable Long id,
+        @Parameter(hidden = true) @CurrentUser UserVO userVO) {
+        eventService.delete(id, userVO.getId());
+        return ResponseEntity.noContent().build();
     }
 }

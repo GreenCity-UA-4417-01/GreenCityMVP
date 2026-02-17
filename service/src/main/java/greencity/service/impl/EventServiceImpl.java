@@ -6,6 +6,7 @@ import greencity.dto.event.EventDto;
 import greencity.entity.User;
 import greencity.entity.event.*;
 import greencity.enums.InviteScope;
+import greencity.enums.Role;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.mapping.EventDtoMapper;
@@ -16,6 +17,7 @@ import greencity.service.EventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -71,6 +73,34 @@ public class EventServiceImpl implements EventService {
 
         Event saved = eventRepository.save(event);
         return eventDtoMapper.toDto(saved);
+    }
+
+    @Transactional
+    public void delete(Long eventId, Long requesterId) {
+        if (requesterId == null) {
+            throw new BadRequestException("User must be authenticated to delete an event");
+        }
+
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event not found with id: " + eventId));
+
+        boolean isOrganizer = event.getOrganizer() != null
+            && event.getOrganizer().getId() != null
+            && event.getOrganizer().getId().equals(requesterId);
+
+        boolean isAdmin = userRepository.findById(requesterId)
+            .map(user -> user.getRole() == Role.ROLE_ADMIN)
+            .orElse(false);
+
+        if (!isOrganizer && !isAdmin) {
+            throw new AccessDeniedException("Only event organizer or admin can delete event");
+        }
+
+        if (event.getInitiativeTypes() != null) {
+            event.getInitiativeTypes().clear();
+        }
+
+        eventRepository.delete(event);
     }
 
     private void validateInviteScope(boolean open, InviteScope inviteScope) {
