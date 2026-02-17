@@ -4,6 +4,7 @@ import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
 import greencity.service.UserService;
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -99,6 +100,8 @@ public class SecurityConfig {
                 .sendError(SC_UNAUTHORIZED, "Authorize first."))
                 .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities.")))
             .authorizeHttpRequests(req -> req
+                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                .requestMatchers("/error").denyAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/", "/management/", "/management/login").permitAll()
                 .requestMatchers("/v2/api-docs/**", "/v3/api-docs/**", "/swagger.json",
@@ -196,7 +199,9 @@ public class SecurityConfig {
                     "/habit/tags/search",
                     "/habit/search",
                     "/habit/{habitId}/friends/profile-pictures",
-                    "/events/**")
+                    "/events/**",
+                    "/habit/{habitId}/friends/profile-pictures",
+                    "/friendship/getCountOfFriendships")
                 .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
                     "/category",

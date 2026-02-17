@@ -178,5 +178,6 @@
     <include file="db/changelog/logs/ch-drop-user-friends-table-Bokalo.xml"/>
     <include file="db/changelog/logs/ch-add-table-notifications-Herasymenko.xml"/>
     <include file="db/changelog/logs/ch-add-events-schema-MarynaHuz.xml"/>
+    <include file="/db/changelog/logs/ch-add-friendship-adamogorodnik.xml"/>
 </databaseChangeLog>
 
