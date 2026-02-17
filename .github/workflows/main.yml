@@ -1,103 +1,107 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI/CD GreenCity
-# Controls when the action will run.
 
-concurrency: Testing
+concurrency:
+  group: Testing-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master, dev ]
+    branches: [ dev_java21 ]
   pull_request:
-    branches: [ master, dev ]
+    branches: [ dev_java21 ]
+  workflow_dispatch:
 
 env:
   repository: greencity
-  userRepoName: core
+  bootModule: core
   onbootJarName: app.jar
   dockerRepoName: skyere/greencity
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
+
+    permissions:
+      contents: read
+      checks: write
+
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          java-version: 11
-      
-#       - name: Set up Go
-#         uses: actions/setup-go@v3
-#         with:
-#           go-version: 1.18
+          fetch-depth: 0
 
-      - name: Run a multi-line script
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 21
+          cache: maven
+
+      - name: Build, test, JaCoCo report, SonarCloud analysis
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_MVP }}
         run: |
-          git fetch --unshallow
-          mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=ita-social-projects-green-city -Dsonar.organization=ita-social-projects -Dsonar.host.url=https://sonarcloud.io -Dsonar.binaries=target/classes -Dsonar.dynamicAnalysis=reuseReports
+          mvn clean verify jacoco:report sonar:sonar \
+          -Dsonar.projectKey=GreenCity-UA-4417-01_GreenCityMVP \
+          -Dsonar.organization=greencity-ua-4417-01 \
+          -Dsonar.host.url=https://sonarcloud.io
 
       - name: Test Reporter
         uses: dorny/test-reporter@v1.5.0
         if: success() || failure()
         with:
           name: Tests Report
-          path: ${{ env.userRepoName }}/target/surefire-reports/*.xml
+          path: ${{ env.bootModule }}/target/surefire-reports/*.xml
           reporter: java-junit
 
-      - name: Rename user jar to app
-        run: mv $userRepoName/target/*.jar $userRepoName/target/$onbootJarName
+      - name: Rename boot jar to app.jar
+        run: |
+          JAR_PATH=$(ls -1 $bootModule/target/*.jar | grep -vE '(sources|javadoc|original)' | head -n 1)
+          echo "Using jar: $JAR_PATH"
+          mv "$JAR_PATH" "$bootModule/target/$onbootJarName"
 
-      - name: Set outputs
-        run: echo "GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+#      - name: Set outputs
+#        run: echo "GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+#
+#      - name: Docker Login
+#        if: ${{ github.event_name == 'push' }}
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: Build and push Docker images
+#        uses: docker/build-push-action@v3.0.0
+#        with:
+#          context: .
+#          file: Dockerfile
+#          push: true
+#          tags: ${{ env.dockerRepoName }}:test-${{ env.GITHUB_SHA_SHORT }}
 
-      - name: Docker Login
-        uses: docker/login-action@v2.0.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v3.0.0
-        with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: ${{ env.dockerRepoName }}:test-${{ env.GITHUB_SHA_SHORT }}
+#             - name: Kubernetes Set Context
+#               uses: Azure/k8s-set-context@v3.0
+#               with:
+#                 kubeconfig: ${{ secrets.KUBE_CONFIG }}
+#
+#             - name: Set up Postgres
+#               run: kubectl scale deploy postgres --replicas=1 -n test
+#
+#             - name: Kubernetes tests
+#               run: |
+#                 cd chart-test
+#                 go test -v ./...
+#
+#             - name: Post Set up Postgres
+#               if: success() || failure()
+#               run: kubectl scale deploy postgres --replicas=0 -n test
 
-#       - name: Kubernetes Set Context
-#         uses: Azure/k8s-set-context@v3.0
-#         with:
-#           kubeconfig: ${{ secrets.KUBE_CONFIG }}
-      
-#       - name: Set up Postgres
-#         run: kubectl scale deploy postgres --replicas=1 -n test
-      
-#       - name: Kubernetes tests
-#         run: |
-#           cd chart-test
-#           go test -v ./...
-      
-#       - name: Post Set up Postgres
-#         if: success() || failure()
-#         run: kubectl scale deploy postgres --replicas=0 -n test
-
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Deploy 🚀
-        if: ${{ github.event_name == 'push' }}
-        uses: JamesIves/github-pages-deploy-action@3.7.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: .
-          CLEAN: true 
+#      - name: Deploy 🚀
+#        if: ${{ github.event_name == 'push' }}
+#        uses: JamesIves/github-pages-deploy-action@3.7.1
+#        with:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          BRANCH: gh-pages
+#          FOLDER: .
+#          CLEAN: true
