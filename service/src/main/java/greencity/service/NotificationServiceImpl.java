@@ -7,9 +7,9 @@ import greencity.entity.User;
 import greencity.exception.exceptions.NotDeletedException;
 import greencity.repository.NotificationRepo;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,13 +34,13 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     public void createNotification(UserVO receiver, UserVO author, String objectName, String actionType) {
         Notification notification = Notification.builder()
-                .receiver(modelMapper.map(receiver, User.class))
-                .author(modelMapper.map(author, User.class))
-                .objectName(objectName)
-                .actionType(actionType)
-                .creationDate(ZonedDateTime.now())
-                .isRead(false)
-                .build();
+            .receiver(modelMapper.map(receiver, User.class))
+            .author(modelMapper.map(author, User.class))
+            .objectName(objectName)
+            .actionType(actionType)
+            .creationDate(ZonedDateTime.now())
+            .isRead(false)
+            .build();
 
         notificationRepo.save(notification);
     }

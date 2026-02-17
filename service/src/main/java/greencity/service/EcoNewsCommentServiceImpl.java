@@ -9,6 +9,7 @@ import greencity.dto.user.UserVO;
 import greencity.entity.EcoNews;
 import greencity.entity.EcoNewsComment;
 import greencity.entity.User;
+import greencity.enums.NotificationType;
 import greencity.enums.Role;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
@@ -190,24 +191,23 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
      * @param id     of {@link greencity.entity.EcoNewsComment} to like/dislike.
      * @param userVO current {@link User} that wants to like/dislike.
      */
+    @Transactional
     @Override
     public void like(Long id, UserVO userVO) {
         EcoNewsComment comment = ecoNewsCommentRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.COMMENT_NOT_FOUND_EXCEPTION));
         EcoNewsCommentVO ecoNewsCommentVO = modelMapper.map(comment, EcoNewsCommentVO.class);
         if (comment.getUsersLiked().stream()
-                .anyMatch(user -> user.getId().equals(userVO.getId()))) {
+            .anyMatch(user -> user.getId().equals(userVO.getId()))) {
             ecoNewsService.unlikeComment(userVO, ecoNewsCommentVO);
-
         } else {
             ecoNewsService.likeComment(userVO, ecoNewsCommentVO);
             if (!comment.getUser().getId().equals(userVO.getId())) {
                 notificationService.createNotification(
-                        modelMapper.map(comment.getUser(), UserVO.class),
-                        userVO,
-                        comment.getEcoNews().getTitle(),
-                        "LIKED_NEWS_COMMENT"
-                );
+                    modelMapper.map(comment.getUser(), UserVO.class),
+                    userVO,
+                    comment.getEcoNews().getTitle(),
+                    NotificationType.LIKED_NEWS_COMMENT.name());
             }
         }
         ecoNewsCommentRepo.save(modelMapper.map(ecoNewsCommentVO, EcoNewsComment.class));
