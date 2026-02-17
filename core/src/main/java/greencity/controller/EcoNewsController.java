@@ -65,15 +65,16 @@ public class EcoNewsController {
      */
     @Operation(summary = "Add new eco news.")
     @ResponseStatus(value = HttpStatus.CREATED)
-    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = HttpStatuses.CREATED,
-        content = @Content(schema = @Schema(implementation = EcoNewsGenericDto.class))),
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED, content = @Content(
+            schema = @Schema(implementation = EcoNewsGenericDto.class))),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "415",
-                description = "Unsupported Media Type - when request content type is not supported",
-                content = @Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = @Schema(implementation = ExceptionResponse.class)))
+            description = "Unsupported Media Type - when request content type is not supported",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<EcoNewsGenericDto> save(
@@ -152,9 +153,16 @@ public class EcoNewsController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
             content = @Content(schema = @Schema(implementation = EcoNewsGenericDto.class))),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+        @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER, content = @Content),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST, content = @Content(
+            mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = ExceptionResponse.class))),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN, content = @Content(
+            mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = ExceptionResponse.class))),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND, content = @Content(
+            mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PutMapping(path = "/update", consumes = {MediaType.APPLICATION_JSON_VALUE,
         MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -232,18 +240,15 @@ public class EcoNewsController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(
-                responseCode = "400",
-                description = HttpStatuses.BAD_REQUEST,
-                content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = ExceptionResponse.class)
-                )
-            ),
+            responseCode = "400",
+            description = HttpStatuses.BAD_REQUEST,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ExceptionResponse.class))),
         @ApiResponse(
-                    responseCode = "401",
-                    description = HttpStatuses.UNAUTHORIZED,
-                    content = @Content()
-        )
+            responseCode = "401",
+            description = HttpStatuses.UNAUTHORIZED,
+            content = @Content())
     })
     @GetMapping("/byUserPage")
     @ApiPageable
@@ -264,20 +269,17 @@ public class EcoNewsController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(
-                  responseCode = "400",
-                  description = HttpStatuses.BAD_REQUEST,
-                  content = @Content(
-                          mediaType = "application/json",
-                          schema = @Schema(implementation = ExceptionResponse.class)
-                    )
-            ),
+            responseCode = "400",
+            description = HttpStatuses.BAD_REQUEST,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ExceptionResponse.class))),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403",
-                    description = HttpStatuses.FORBIDDEN,
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = ExceptionResponse.class))
-        ),
+            description = HttpStatuses.FORBIDDEN,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ExceptionResponse.class))),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @DeleteMapping("/{econewsId}")
@@ -319,12 +321,11 @@ public class EcoNewsController {
      */
     @Operation(summary = "Get three recommended eco news.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400",description = HttpStatuses.BAD_REQUEST,
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST,
             content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ExceptionResponse.class)
-            ))
+                mediaType = "application/json",
+                schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/recommended")
     public ResponseEntity<List<EcoNewsDto>> getThreeRecommendedEcoNews(@RequestParam() Long openedEcoNewsId) {

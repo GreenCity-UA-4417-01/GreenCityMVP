@@ -43,7 +43,7 @@ class NotificationServiceImplTest {
         notification.setRead(false);
 
         when(notificationRepo.findAllByReceiverIdOrderByCreationDateDesc(userId))
-                .thenReturn(List.of(notification));
+            .thenReturn(List.of(notification));
 
         List<NotificationDto> result = notificationService.getAllNotifications(userId);
 
@@ -57,7 +57,7 @@ class NotificationServiceImplTest {
         assertFalse(dto.isRead());
 
         verify(notificationRepo, times(1))
-                .findAllByReceiverIdOrderByCreationDateDesc(userId);
+            .findAllByReceiverIdOrderByCreationDateDesc(userId);
     }
 
     @Test
@@ -65,7 +65,7 @@ class NotificationServiceImplTest {
         Long userId = 1L;
 
         when(notificationRepo.findAllByReceiverIdOrderByCreationDateDesc(userId))
-                .thenReturn(Collections.emptyList());
+            .thenReturn(Collections.emptyList());
 
         List<NotificationDto> result = notificationService.getAllNotifications(userId);
 
@@ -73,7 +73,7 @@ class NotificationServiceImplTest {
         assertTrue(result.isEmpty());
 
         verify(notificationRepo, times(1))
-                .findAllByReceiverIdOrderByCreationDateDesc(userId);
+            .findAllByReceiverIdOrderByCreationDateDesc(userId);
     }
 
     @Test
@@ -82,13 +82,12 @@ class NotificationServiceImplTest {
         Long userId = 1L;
 
         when(notificationRepo.deleteByIdAndReceiverId(notificationId, userId))
-                .thenReturn(1);
+            .thenReturn(1);
 
-        assertDoesNotThrow(() ->
-                notificationService.deleteNotification(notificationId, userId));
+        assertDoesNotThrow(() -> notificationService.deleteNotification(notificationId, userId));
 
         verify(notificationRepo, times(1))
-                .deleteByIdAndReceiverId(notificationId, userId);
+            .deleteByIdAndReceiverId(notificationId, userId);
     }
 
     @Test
@@ -97,12 +96,11 @@ class NotificationServiceImplTest {
         Long userId = 1L;
 
         when(notificationRepo.deleteByIdAndReceiverId(notificationId, userId))
-                .thenReturn(0);
+            .thenReturn(0);
 
-        assertThrows(NotDeletedException.class, () ->
-                notificationService.deleteNotification(notificationId, userId));
+        assertThrows(NotDeletedException.class, () -> notificationService.deleteNotification(notificationId, userId));
 
         verify(notificationRepo, times(1))
-                .deleteByIdAndReceiverId(notificationId, userId);
+            .deleteByIdAndReceiverId(notificationId, userId);
     }
 }
