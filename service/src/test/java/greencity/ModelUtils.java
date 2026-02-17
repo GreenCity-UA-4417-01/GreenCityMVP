@@ -179,7 +179,7 @@ public class ModelUtils {
         tag.setTagTranslations(
             List.of(TagTranslation.builder().name("Новини").language(Language.builder().code("ua").build()).build(),
                 TagTranslation.builder().name("News").language(Language.builder().code("en").build()).build()));
-        return new EcoNews(1L, zonedDateTime, TestConst.SITE, "source", "shortInfo", getUser(),
+        return new EcoNews(1L, zonedDateTime, TestConst.SITE, "source", null, getUser(),
             "title", "text", List.of(EcoNewsComment.builder().id(1L).text("test").build()),
             Collections.singletonList(tag), Collections.emptySet(), Collections.emptySet());
     }
@@ -349,12 +349,12 @@ public class ModelUtils {
 
     public static AddEcoNewsDtoRequest getAddEcoNewsDtoRequest() {
         return new AddEcoNewsDtoRequest("title", "text",
-            Collections.singletonList("News"), "source", null, "shortInfo");
+            Collections.singletonList("News"), "source");
     }
 
     public static AddEcoNewsDtoResponse getAddEcoNewsDtoResponse() {
         return new AddEcoNewsDtoResponse(1L, "title",
-            "text", "shortInfo", EcoNewsAuthorDto.builder().id(1L).name(TestConst.NAME).build(),
+            "text", null, EcoNewsAuthorDto.builder().id(1L).name(TestConst.NAME).build(),
             ZonedDateTime.now(), TestConst.SITE, "source",
             Arrays.asList("Новини", "News"));
     }
@@ -478,13 +478,13 @@ public class ModelUtils {
     public static EcoNewsGenericDto getEcoNewsGenericDto() {
         String[] tagsEn = {"News"};
         String[] tagsUa = {"Новини"};
-        return new EcoNewsGenericDto(1L, "title", "text", "shortInfo",
+        return new EcoNewsGenericDto(1L, "title", "text", null,
             ModelUtils.getEcoNewsAuthorDto(), zonedDateTime, "https://google.com/", "source",
             List.of(tagsUa), List.of(tagsEn), 0, 1, 0);
     }
 
     public static EcoNewsDto getEcoNewsDtoForFindDtoByIdAndLanguage() {
-        return new EcoNewsDto(null, TestConst.SITE, 1L, "title", "text", "shortInfo",
+        return new EcoNewsDto(null, TestConst.SITE, 1L, "title", "text", null,
             getEcoNewsAuthorDto(), Collections.singletonList("News"), Collections.singletonList("Новини"), 0, 0, 0);
     }
 
