@@ -199,6 +199,8 @@ public class SecurityConfig {
                     "/habit/tags/search",
                     "/habit/search",
                     "/habit/{habitId}/friends/profile-pictures",
+                    "/events/**",
+                    "/habit/{habitId}/friends/profile-pictures",
                     "/friendship/getCountOfFriendships")
                 .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
@@ -221,7 +223,8 @@ public class SecurityConfig {
                     USER_SHOPPING_LIST,
                     "/user/{userId}/habit",
                     "/habit/custom",
-                    "/custom/shopping-list-items/{userId}/{habitId}/custom-shopping-list-items")
+                    "/custom/shopping-list-items/{userId}/{habitId}/custom-shopping-list-items",
+                    "/events/**")
                 .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                 .requestMatchers(HttpMethod.PUT,
                     "/habit/statistic/{id}",
@@ -248,6 +251,7 @@ public class SecurityConfig {
                 .hasAnyRole(USER, ADMIN, MODERATOR, UBS_EMPLOYEE)
                 .requestMatchers(HttpMethod.DELETE,
                     ECONEWS_COMMENTS,
+                    "/events/**",
                     "/events/comments/{eventCommentId}",
                     "/econews/{econewsId}",
                     CUSTOM_SHOPPING_LIST_ITEMS,

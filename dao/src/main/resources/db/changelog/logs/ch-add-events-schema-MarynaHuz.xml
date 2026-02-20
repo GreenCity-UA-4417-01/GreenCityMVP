@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="2026-01-31-events-0-create-initiative-types" author="MarynaHuz">
+        <createTable tableName="initiative_types">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_initiative_types"/>
+            </column>
+
+            <column name="code" type="varchar(30)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_initiative_types_code"/>
+            </column>
+
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql>
+            INSERT INTO initiative_types(code, name)
+            VALUES ('ECONOMIC', 'Economic'),
+                   ('SOCIAL', 'Social'),
+                   ('ENVIRONMENTAL', 'Environmental');
+        </sql>
+    </changeSet>
+
+    <changeSet id="2026-01-31-events-1-create-events" author="MarynaHuz">
+        <createTable tableName="events">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_events"/>
+            </column>
+
+            <column name="organizer_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="title" type="varchar(70)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="text">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="is_open" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="invite_scope" type="varchar(10)" defaultValue="ALL">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp with time zone" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="events"
+                                 baseColumnNames="organizer_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_events_organizer"/>
+
+        <createIndex indexName="idx_events_organizer_id" tableName="events">
+            <column name="organizer_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_events_created_at" tableName="events">
+            <column name="created_at"/>
+        </createIndex>
+
+        <sql>
+            ALTER TABLE events
+                ADD CONSTRAINT chk_events_invite_scope
+                    CHECK (invite_scope IN ('ALL', 'FRIENDS'));
+        </sql>
+
+        <sql>
+            ALTER TABLE events
+                ADD CONSTRAINT chk_events_closed_requires_friends
+                    CHECK (is_open = true OR invite_scope = 'FRIENDS');
+        </sql>
+    </changeSet>
+
+    <changeSet id="2026-01-31-events-1-1-create-events-initiative-types" author="MarynaHuz">
+        <createTable tableName="events_initiative_types">
+            <column name="event_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="initiative_type_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="events_initiative_types"
+                       columnNames="event_id, initiative_type_id"
+                       constraintName="pk_events_initiative_types"/>
+
+        <addForeignKeyConstraint baseTableName="events_initiative_types"
+                                 baseColumnNames="event_id"
+                                 referencedTableName="events"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_eit_event"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="events_initiative_types"
+                                 baseColumnNames="initiative_type_id"
+                                 referencedTableName="initiative_types"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_eit_initiative_type"/>
+
+        <createIndex indexName="idx_eit_initiative_type_id" tableName="events_initiative_types">
+            <column name="initiative_type_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_eit_event_id" tableName="events_initiative_types">
+            <column name="event_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-01-31-events-2-create-event-date-time-locations" author="MarynaHuz">
+        <createTable tableName="event_date_time_locations">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_event_date_time_locations"/>
+            </column>
+
+            <column name="event_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="start_date_time" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="end_date_time" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="all_day" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="location_name" type="varchar(255)"/>
+
+            <column name="latitude" type="numeric(9,6)"/>
+            <column name="longitude" type="numeric(9,6)"/>
+
+            <column name="online_link" type="varchar(2048)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="event_date_time_locations"
+                                 baseColumnNames="event_id"
+                                 referencedTableName="events"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_edtl_event"
+                                 onDelete="CASCADE"/>
+
+        <createIndex indexName="idx_edtl_event_id" tableName="event_date_time_locations">
+            <column name="event_id"/>
+        </createIndex>
+
+        <sql>
+            ALTER TABLE event_date_time_locations
+                ADD CONSTRAINT chk_edtl_end_gt_start
+                    CHECK (end_date_time &gt; start_date_time);
+        </sql>
+
+        <sql>
+            ALTER TABLE event_date_time_locations
+                ADD CONSTRAINT chk_edtl_coords_paired
+                    CHECK (
+                        (latitude IS NULL AND longitude IS NULL)
+                            OR
+                        (latitude IS NOT NULL AND longitude IS NOT NULL)
+                        );
+        </sql>
+
+        <sql>
+            ALTER TABLE event_date_time_locations
+                ADD CONSTRAINT chk_edtl_link_or_coords
+                    CHECK (
+                        (online_link IS NOT NULL)
+                            OR
+                        (latitude IS NOT NULL AND longitude IS NOT NULL)
+                        );
+        </sql>
+    </changeSet>
+
+    <changeSet id="2026-01-31-events-3-create-event-images" author="MarynaHuz">
+        <createTable tableName="event_images">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_event_images"/>
+            </column>
+
+            <column name="event_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="is_main" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="content_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="file_name" type="varchar(255)"/>
+
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="event_images"
+                                 baseColumnNames="event_id"
+                                 referencedTableName="events"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_event_images_event"
+                                 onDelete="CASCADE"/>
+
+        <createIndex indexName="idx_event_images_event_id" tableName="event_images">
+            <column name="event_id"/>
+        </createIndex>
+
+        <sql>
+            ALTER TABLE event_images
+                ADD CONSTRAINT chk_event_images_content_type
+                    CHECK (content_type IN ('image/jpeg', 'image/png'));
+        </sql>
+
+        <sql>
+            CREATE UNIQUE INDEX IF NOT EXISTS ux_event_images_one_main_per_event
+                ON event_images (event_id)
+                WHERE is_main = true;
+        </sql>
+    </changeSet>
+
+    <changeSet id="2026-01-31-events-4-create-event-image-data" author="MarynaHuz">
+        <createTable tableName="event_image_data">
+            <column name="image_id" type="bigint">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_event_image_data"/>
+            </column>
+
+            <column name="data" type="bytea">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="event_image_data"
+                                 baseColumnNames="image_id"
+                                 referencedTableName="event_images"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_event_image_data_image"
+                                 onDelete="CASCADE"/>
+
+        <sql>
+            ALTER TABLE event_image_data
+                ADD CONSTRAINT chk_event_image_data_size_10mb
+                    CHECK (octet_length(data) &lt;= 10485760);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
