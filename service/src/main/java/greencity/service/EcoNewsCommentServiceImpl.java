@@ -9,6 +9,7 @@ import greencity.dto.user.UserVO;
 import greencity.entity.EcoNews;
 import greencity.entity.EcoNewsComment;
 import greencity.entity.User;
+import greencity.enums.NotificationType;
 import greencity.enums.Role;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
@@ -38,6 +39,7 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
     private final greencity.rating.RatingCalculation ratingCalculation;
     private final HttpServletRequest httpServletRequest;
     private final EcoNewsRepo ecoNewsRepo;
+    private final NotificationService notificationService;
 
     /**
      * Method to save {@link greencity.entity.EcoNewsComment}.
@@ -189,6 +191,7 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
      * @param id     of {@link greencity.entity.EcoNewsComment} to like/dislike.
      * @param userVO current {@link User} that wants to like/dislike.
      */
+    @Transactional
     @Override
     public void like(Long id, UserVO userVO) {
         EcoNewsComment comment = ecoNewsCommentRepo.findById(id)
@@ -199,6 +202,13 @@ public class EcoNewsCommentServiceImpl implements EcoNewsCommentService {
             ecoNewsService.unlikeComment(userVO, ecoNewsCommentVO);
         } else {
             ecoNewsService.likeComment(userVO, ecoNewsCommentVO);
+            if (!comment.getUser().getId().equals(userVO.getId())) {
+                notificationService.createNotification(
+                    modelMapper.map(comment.getUser(), UserVO.class),
+                    userVO,
+                    comment.getEcoNews().getTitle(),
+                    NotificationType.LIKED_NEWS_COMMENT.name());
+            }
         }
         ecoNewsCommentRepo.save(modelMapper.map(ecoNewsCommentVO, EcoNewsComment.class));
     }

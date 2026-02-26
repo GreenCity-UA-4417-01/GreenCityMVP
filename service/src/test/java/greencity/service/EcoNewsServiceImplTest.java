@@ -501,7 +501,6 @@ class EcoNewsServiceImplTest {
         ecoNews.getAuthor().setId(2L);
 
         EcoNewsVO ecoNewsVO = ModelUtils.getEcoNewsVO();
-        EcoNewsDto ecoNewsDto = ModelUtils.getEcoNewsDto();
         UpdateEcoNewsDto updateEcoNewsDto = ModelUtils.getUpdateEcoNewsDto();
 
         when(ecoNewsRepo.findById(1L)).thenReturn(Optional.of(ecoNews));

@@ -5,6 +5,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,9 +45,13 @@ public class EcoNewsComment {
     private List<EcoNewsComment> comments = new ArrayList<>();
 
     @ManyToOne
+    @JoinColumn(nullable = false)
+    @NotNull
     private User user;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
+    @NotNull
     private EcoNews ecoNews;
 
     @Column

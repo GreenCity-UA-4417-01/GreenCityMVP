@@ -9,6 +9,7 @@ import greencity.dto.user.UserVO;
 import greencity.entity.EcoNews;
 import greencity.entity.EcoNewsComment;
 import greencity.entity.User;
+import greencity.enums.NotificationType;
 import greencity.enums.Role;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
@@ -57,6 +58,8 @@ class EcoNewsCommentServiceImplTest {
     private HttpServletRequest httpServletRequest;
     @Mock
     EcoNewsRepo ecoNewsRepo;
+    @Mock
+    private NotificationService notificationService;
     @InjectMocks
     private EcoNewsCommentServiceImpl ecoNewsCommentService;
 
@@ -343,8 +346,11 @@ class EcoNewsCommentServiceImplTest {
         when(ecoNewsCommentRepo.findById(commentId)).thenReturn(Optional.of(ecoNewsComment));
         when(modelMapper.map(ecoNewsComment, EcoNewsCommentVO.class)).thenReturn(ecoNewsCommentVO);
         when(modelMapper.map(ecoNewsCommentVO, EcoNewsComment.class)).thenReturn(ecoNewsComment);
+        when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
 
         ecoNewsCommentService.like(commentId, userVO);
+        verify(notificationService).createNotification(any(), any(), any(),
+            eq(NotificationType.LIKED_NEWS_COMMENT.name()));
 
         verify(ecoNewsService).likeComment(userVO, ecoNewsCommentVO);
     }
@@ -488,4 +494,22 @@ class EcoNewsCommentServiceImplTest {
         PageableDto<EcoNewsCommentDto> actual = ecoNewsCommentService.findAllActiveReplies(pageRequest, 1L, userVO);
         assertEquals(pageableDto, actual);
     }
+
+    @Test
+    void countOfCommentsReturnsCorrectValueTest() {
+        Long ecoNewsId = 1L;
+        EcoNews ecoNews = ModelUtils.getEcoNews();
+
+        when(ecoNewsRepo.findById(ecoNewsId)).thenReturn(Optional.of(ecoNews));
+        when(ecoNewsCommentRepo.countEcoNewsCommentByEcoNews(ecoNews.getId()))
+            .thenReturn(5);
+
+        int result = ecoNewsCommentService.countOfComments(ecoNewsId);
+
+        assertEquals(5, result);
+        verify(ecoNewsRepo, times(1)).findById(ecoNewsId);
+        verify(ecoNewsCommentRepo, times(1))
+            .countEcoNewsCommentByEcoNews(ecoNews.getId());
+    }
+
 }
