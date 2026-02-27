@@ -107,7 +107,6 @@ class EcoNewsServiceImplTest {
     void saveWithExistedImage() throws IOException {
         MultipartFile image = ModelUtils.getFile();
         String imageToEncode = Base64.getEncoder().encodeToString(image.getBytes());
-        addEcoNewsDtoRequest.setImage(imageToEncode);
 
         when(modelMapper.map(addEcoNewsDtoRequest, EcoNews.class)).thenReturn(ecoNews);
         when(restClient.findByEmail(TestConst.EMAIL)).thenReturn(ModelUtils.getUserVO());
@@ -149,7 +148,6 @@ class EcoNewsServiceImplTest {
     void saveEcoNews() {
         MultipartFile image = ModelUtils.getFile();
         String imageToEncode = Base64.getEncoder().encodeToString(image.getBytes());
-        addEcoNewsDtoRequest.setImage(imageToEncode);
 
         when(modelMapper.map(addEcoNewsDtoRequest, EcoNews.class)).thenReturn(ecoNews);
         when(restClient.findByEmail(TestConst.EMAIL)).thenReturn(ModelUtils.getUserVO());
@@ -180,7 +178,6 @@ class EcoNewsServiceImplTest {
             .id(1L)
             .title("test title")
             .content("content")
-            .shortInfo(null)
             .author(ModelUtils.getEcoNewsAuthorDto())
             .tags(Collections.emptyList())
             .tagsUa(Collections.emptyList())
@@ -227,7 +224,6 @@ class EcoNewsServiceImplTest {
                 .id(1L)
                 .title("test title")
                 .content("content")
-                .shortInfo(null)
                 .author(ModelUtils.getEcoNewsAuthorDto())
                 .tags(Collections.emptyList())
                 .tagsUa(Collections.emptyList())

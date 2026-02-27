@@ -693,7 +693,6 @@ public class EcoNewsServiceImpl implements EcoNewsService {
             .author(ecoNewsAuthorDto)
             .tagsEn(tags.stream().filter(tag -> tag.matches("^([A-Za-z-])+$")).collect(Collectors.toList()))
             .tagsUa(tags.stream().filter(tag -> tag.matches("^([А-Яа-яієїґ'-])+$")).collect(Collectors.toList()))
-            .shortInfo(ecoNews.getShortInfo())
             .content(ecoNews.getText())
             .title(ecoNews.getTitle())
             .creationDate(ecoNews.getCreationDate())
@@ -716,7 +715,6 @@ public class EcoNewsServiceImpl implements EcoNewsService {
             .likes(ecoNews.getUsersLikedNews().size())
             .tags(list.stream().filter(tag -> tag.matches("^([A-Za-z-])+$")).collect(Collectors.toList()))
             .tagsUa(list.stream().filter(tag -> tag.matches("^([А-Яа-яієїґ'-])+$")).collect(Collectors.toList()))
-            .shortInfo(ecoNews.getShortInfo())
             .content(ecoNews.getText())
             .title(ecoNews.getTitle())
             .creationDate(ecoNews.getCreationDate())
@@ -748,15 +746,11 @@ public class EcoNewsServiceImpl implements EcoNewsService {
         UserVO byEmail = restClient.findByEmail(email);
         User user = modelMapper.map(byEmail, User.class);
         toSave.setAuthor(user);
-        if (addEcoNewsDtoRequest.getImage() != null) {
-            image = fileService.convertToMultipartImage(addEcoNewsDtoRequest.getImage());
-        }
         if (image != null) {
             toSave.setImagePath(fileService.upload(image));
         }
 
         Set<String> tagsSet = new HashSet<>(addEcoNewsDtoRequest.getTags());
-
         if (tagsSet.size() < addEcoNewsDtoRequest.getTags().size()) {
             throw new NotSavedException(ErrorMessage.ECO_NEWS_NOT_SAVED);
         }
@@ -764,9 +758,9 @@ public class EcoNewsServiceImpl implements EcoNewsService {
         List<TagVO> tagVOS = tagService.findTagsByNamesAndType(
             addEcoNewsDtoRequest.getTags(), TagType.ECO_NEWS);
 
-        toSave.setTags(modelMapper.map(tagVOS,
-            new TypeToken<List<Tag>>() {
-            }.getType()));
+        toSave.setTags(modelMapper.map(tagVOS, new TypeToken<List<Tag>>() {
+        }.getType()));
+
         try {
             ecoNewsRepo.save(toSave);
             String accessToken = httpServletRequest.getHeader(AUTHORIZATION);
