@@ -10,6 +10,8 @@ import greencity.dto.search.SearchResponseDto;
 import greencity.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content; // Добавлено
+import io.swagger.v3.oas.annotations.media.Schema;  // Добавлено
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
@@ -33,9 +35,10 @@ public class SearchController {
      */
     @Operation(summary = "Search.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+            @ApiResponse(responseCode = "201", description = HttpStatuses.OK,
+                    content = @Content(schema = @Schema(implementation = SearchResponseDto.class))), // Добавлено требование команды
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @ApiLocale
     @GetMapping("")
@@ -53,17 +56,18 @@ public class SearchController {
      */
     @Operation(summary = "Search Eco news.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+            @ApiResponse(responseCode = "201", description = HttpStatuses.OK,
+                    content = @Content(schema = @Schema(implementation = PageableDto.class))), // Добавлено требование команды
+            @ApiResponse(responseCode = "303", description = HttpStatuses.SEE_OTHER),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/econews")
     @ApiPageableWithLocale
     public ResponseEntity<PageableDto<SearchNewsDto>> searchEcoNews(
-        @Parameter(hidden = true) Pageable pageable,
-        @Parameter(description = "Query to search") @RequestParam String searchQuery,
-        @Parameter(hidden = true) @ValidLanguage Locale locale) {
+            @Parameter(hidden = true) Pageable pageable,
+            @Parameter(description = "Query to search") @RequestParam String searchQuery,
+            @Parameter(hidden = true) @ValidLanguage Locale locale) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(searchService.searchAllNews(pageable, searchQuery, locale.getLanguage()));
+                .body(searchService.searchAllNews(pageable, searchQuery, locale.getLanguage()));
     }
 }
